@@ -1,0 +1,17 @@
+$highlight-color: #E65252;
+
+/*----------------*
+ *** CHOROPLETH ***
+ *----------------*/
+ 
+#choropleth {
+  .state {
+    stroke: #666;
+    stroke-width: 0.5;  
+    
+    &.highlighted {
+      stroke: $highlight-color;
+      stroke-width: 4;
+    }
+  }
+}

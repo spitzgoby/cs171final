@@ -21,7 +21,10 @@ var paths = {
         './src/js/lib/d3.min.js',
         './src/js/lib/*.js'
       ], 
-      src: './src/js/*.js'
+      src: [
+        './src/js/main.js',
+        './src/js/*.js'
+      ]
     },
     css: ['./src/css/*.scss', './src/css/*.css']},
   dest: {

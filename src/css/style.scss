@@ -1,8 +1,34 @@
+$axis-color:       #999;
+$axis-font-family: 'Helvetica-neue', sans-serif;
+
+/*----------*
+ *** PAGE ***
+ *----------*/
+ 
 body {
-  div {
-    p {
-      font-size: 10pt;
-      color: green;
+  margin-top: 70px;
+}
+
+/*--------------------*
+ *** VISUALIZATIONS ***
+ *--------------------*/
+.axis {
+  shape-rendering: crispEdges;
+  
+  line {
+    fill: none;
+    stroke: $axis-color; }  
+    
+  path {
+    display: none; }
+    
+  text {
+    fill: $axis-color;
+    font-family: $axis-font-family;
+    
+    &.axis-label {
+      fill: #333;
+      font-weight: bold;
     }
   }
 }

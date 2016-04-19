@@ -1,0 +1,81 @@
+$factor-button-font: 'Helvetica-neue', sans-serif;
+$factor-color: #23A923;
+$death-color:  #54278F;
+$highlight-color: #E65252;
+
+/*-------------------------*
+ *** SCATTERPLOT OPTIONS ***
+ *-------------------------*/
+ 
+/* CONTROLS */
+#viz-controls {
+  background-color: #eee;  
+  padding: 10px;
+  margin-top: 5px;
+  
+  .btn.btn-factor {
+    font-family: $factor-button-font;
+    font-weight: bold;
+    background-color: white;
+    border: 1px solid $factor-color;
+    color: $factor-color;  
+    
+    &.active, &:active, &:focus, &.active:focus {
+      box-shadow: none;
+      outline: none;  
+    }
+    
+    &.active, &.active:hover {
+      background-color: $factor-color;
+      color: white;
+    }
+    
+    &:hover {
+      background-color: $factor-color;
+      color: white;
+    }
+  }
+}
+
+/* YEAR SLIDER */
+
+#year-slider {
+  .factor {
+    fill: $factor-color;
+  }
+
+  .death_rate {
+    fill: $death-color;
+  }
+}
+
+/*-----------------*
+ *** SCATTERPLOT ***
+ *-----------------*/
+
+/* SCATTERPLOT */
+#scatterplot {
+  .best-fit {
+    stroke-width: 2px;
+    stroke: $factor-color;
+  }
+  
+  circle.dot {
+    stroke: #999;
+    stroke-width: 0.5;
+    
+    &.highlighted {
+      stroke: $highlight-color;
+      stroke-width: 4;
+    }
+  }
+  
+  .factor {
+    fill: $factor-color;
+  }
+
+  .death_rate {
+    fill: $death-color;
+  }
+} 
+ 
