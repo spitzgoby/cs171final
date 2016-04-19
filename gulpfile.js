@@ -51,6 +51,15 @@ gulp.task('libs', ['clean-libs'], function() {
     .pipe(gulp.dest(paths.dest.js));
 });
 
+gulp.task('scripts', ['clean-scripts'], function() {
+  return gulp.src(paths.src.js.src)
+    .pipe(concat('main.min.js'))
+    .pipe(sourcemaps.init())
+      .pipe(uglify())
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest(paths.dest.js));
+});
+
 /*-----------*
  *** CLEAN ***
  *-----------*/
@@ -61,13 +70,17 @@ gulp.task('clean-styles', function() {
 });
 // clean generated scripts and sourcemaps
 gulp.task('clean-libs', function() {
-  return gulp.src(paths.dest.js)
+  return gulp.src(paths.dest.js+'/libs.min.*')
+    .pipe(clean({read: false}));
+});
+gulp.task('clean-scripts', function() {
+  return gulp.src(paths.dest.js+'/main.min.*')
     .pipe(clean({read: false}));
 });
 // clean all generated files
-gulp.task('clean', ['clean-styles'])
+gulp.task('clean', ['clean-styles', 'clean-scripts']);
 
 /*-------------*
  *** DEFAULT ***
  *-------------*/
-gulp.task('default', ['styles']);
+gulp.task('default', ['styles', 'scripts']);
