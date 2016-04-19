@@ -4,7 +4,8 @@ var formatYear = d3.time.format('%Y');
 var parseYear = formatYear.parse;
 
 // universal color scale
-var colors = d3.scale.quantize()
+colorbrewer.Purples[6].unshift('#ffffff');
+var colors = d3.scale.quantile()
   .range(colorbrewer.Purples[6]);
     
 /***---------------------***

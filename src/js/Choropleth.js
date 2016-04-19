@@ -48,10 +48,13 @@ Choropleth.prototype.initVis = function() {
   var vis = this;
   
   /* ** CREATE DRAWING AREA ** */
-  vis.margin = { top: 20, right: 20, bottom: 20, left: 20 };
+  vis.margin = { top: 80, right: 20, bottom: 20, left: 20 };
+  vis.keyHeight = 60;
+  vis.keyRectHeight = 20;
   vis.svg = d3.select('#'+vis.parentElem).append('svg')
     .classed('us-map', true);
   vis.graph = vis.svg.append('g');
+  vis.key = vis.svg.append('g').classed('key', true);
       
   /*** MAP DRAWING FUNCTIONS ***/
   vis.projection = d3.geo.albersUsa();
@@ -82,9 +85,10 @@ Choropleth.prototype.resize = function() {
   vis.height = vis.width * .65 - vis.margin.top - vis.margin.bottom;
   
   vis.svg.attr('width', vis.width + vis.margin.left + vis.margin.right)
-    .attr('height', vis.height + vis.margin.top + vis.margin.bottom);
+    .attr('height', vis.height + vis.margin.top + vis.margin.bottom + vis.keyHeight);
       
   vis.graph.attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
+  vis.keyWidth = Math.floor((1/6)*vis.width);
     
   vis.projection.scale(vis.width * 1.2)
     .translate([vis.width/2, vis.height/2]);
@@ -139,15 +143,31 @@ Choropleth.prototype.update = function(options) {
   
   var duration = options.duration ? options.duration : vis.default.duration;
   // change colors domain
-  colors.domain([0, 20]);
+  colors.domain([0, 1, 5, 10, 15, 20]);
+  var keyRects = vis.key.selectAll('rect').data(colors.domain());
+  keyRects.enter().append('rect')
+    .classed('key-rect', true);
+  keyRects.transition().duration(duration)
+    .attr('x', function(d, i) { return i * vis.keyWidth; })
+    .attr('y', vis.keyRectHeight)
+    .attr('width', vis.keyWidth)
+    .attr('height', vis.keyRectHeight)
+    .attr('fill', function(d) { return colors(d); });
+  
+  var keyLabels = vis.key.selectAll('text').data(colors.domain())
+  keyLabels.enter().append('text')
+    .classed('key-label', true);
+  keyLabels.transition().duration(duration)
+    .text(function(d) { return d; })
+    .attr('x', function(d,i) { return i * vis.keyWidth})
+    .attr('y', vis.keyRectHeight*3);
+    
   
   vis.states = vis.graph.selectAll('path')
     .data(topojson.feature(vis.topo, vis.topo.objects.usa).features);
   vis.states.enter()
     .append('path')
       .classed('state', true)
-      .attr('stroke', '#666')
-      .attr('stroke-width', 0.5)
       .on('mouseover', function(d) { vis.highlightState(d); })
       .on('mouseout', function(d) { vis.unhighlightState(d); });
   vis.states.transition().duration(duration)
