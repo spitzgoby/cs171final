@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Substance Abuse Data View</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.min.css">
 </head>
 <body>
+  <div id="content"></div>
   
+  <script src="js/libs.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      alert('jQuery is working!');
+      d3.select('#content').append('p').text('d3 is working');
+    });
+  </script>
 </body>
 </html>

@@ -16,7 +16,11 @@ var gulp = require('gulp'),
 var paths = {
   src: {
     js: {
-      lib: './src/js/lib/*.js', 
+      lib: [
+        './src/js/lib/jquery.min.js', 
+        './src/js/lib/d3.min.js',
+        './src/js/lib/*.js'
+      ], 
       src: './src/js/*.js'
     },
     css: ['./src/css/*.scss', './src/css/*.css']},
@@ -28,13 +32,13 @@ var paths = {
 /*-----------*
  *** STYLE ***
  *-----------*/
+// concats and minifies sass and css
 gulp.task('styles', ['clean-styles'], function() {
-  return sass(paths.src.css, {})
-    .pipe(concat('style.css'))
-    .pipe(autoprefixer('last 2 version'))
+  return sass(paths.src.css)
+    .pipe(concat('style.min.css'))
     .pipe(sourcemaps.init())
       .pipe(cleanCSS())
-    .pipe(sourcemaps.write(paths.dest.css))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(paths.dest.css));
 });
 
@@ -51,6 +55,7 @@ gulp.task('libs', ['clean-libs'], function() {
     .pipe(gulp.dest(paths.dest.js));
 });
 
+// concats and minifies visualization scripts 
 gulp.task('scripts', ['clean-scripts'], function() {
   return gulp.src(paths.src.js.src)
     .pipe(concat('main.min.js'))
@@ -63,9 +68,10 @@ gulp.task('scripts', ['clean-scripts'], function() {
 /*-----------*
  *** CLEAN ***
  *-----------*/
+ 
 // clean generated css and sourcemaps
 gulp.task('clean-styles', function() {
-  return gulp.src([paths.dest.css, paths.dest.css])
+  return gulp.src(paths.dest.css+'/style.min.css')
     .pipe(clean({read: false}));
 });
 // clean generated scripts and sourcemaps
@@ -77,7 +83,7 @@ gulp.task('clean-scripts', function() {
   return gulp.src(paths.dest.js+'/main.min.*')
     .pipe(clean({read: false}));
 });
-// clean all generated files
+// clean all generated files except libs
 gulp.task('clean', ['clean-styles', 'clean-scripts']);
 
 /*-------------*
