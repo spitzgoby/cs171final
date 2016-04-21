@@ -13,6 +13,7 @@ function Choropleth(parentElem, topo, data) {
   this.data = data;
   this.displayData = {};
   
+  this.sizeGroup = "medium";
   this.default = {
     duration: 1000
   };
@@ -48,13 +49,17 @@ Choropleth.prototype.initVis = function() {
   var vis = this;
   
   /* ** CREATE DRAWING AREA ** */
-  vis.margin = { top: 80, right: 20, bottom: 20, left: 20 };
-  vis.keyHeight = 60;
+  vis.margin = { top: 100, right: 20, bottom: 20, left: 20 };
+  vis.keyHeight = 80;
   vis.keyRectHeight = 20;
   vis.svg = d3.select('#'+vis.parentElem).append('svg')
     .classed('us-map', true);
   vis.graph = vis.svg.append('g');
   vis.key = vis.svg.append('g').classed('key', true);
+  vis.keyTitle = vis.key.append('text')
+    .text('Deaths Per 100,000')
+    .classed('key-title', true)
+    .attr('text-anchor', 'middle');
       
   /*** MAP DRAWING FUNCTIONS ***/
   vis.projection = d3.geo.albersUsa();
@@ -82,20 +87,40 @@ Choropleth.prototype.resize = function() {
   var vis = this;
   
   vis.width = parseInt(d3.select('#'+vis.parentElem).style('width')) - vis.margin.left - vis.margin.right;
-  vis.height = vis.width * .65 - vis.margin.top - vis.margin.bottom;
+  vis.height = vis.width * .85 - vis.margin.top - vis.margin.bottom;
   
   vis.svg.attr('width', vis.width + vis.margin.left + vis.margin.right)
     .attr('height', vis.height + vis.margin.top + vis.margin.bottom + vis.keyHeight);
+    
+  vis.key.attr('transform', 'translate(0,40)');
+  vis.keyTitle.attr('x', vis.width/2)
+    .attr('y', 10);
       
   vis.graph.attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
   vis.keyWidth = Math.floor((1/6)*vis.width);
     
-  vis.projection.scale(vis.width * 1.2)
+  vis.projection.scale(vis.width * 1.35)
     .translate([vis.width/2, vis.height/2]);
     
   vis.update({ duration: 0, });
   
   return vis;
+}
+
+Choropleth.prototype.keyLabelOffset = function() {
+  if (this.sizeGroup == 'medium') {
+    return 55;
+  } else {
+    return 50;
+  }
+}
+
+Choropleth.prototype.fontSize = function() {
+  if (this.sizeGroup == "medium") {
+    return '14px';
+  } else {
+    return '12px';
+  }
 }
 
 
@@ -154,13 +179,16 @@ Choropleth.prototype.update = function(options) {
     .attr('height', vis.keyRectHeight)
     .attr('fill', function(d) { return colors(d); });
   
-  var keyLabels = vis.key.selectAll('text').data(colors.domain())
+  var keyLabels = vis.key.selectAll('.key-label').data(colors.domain())
   keyLabels.enter().append('text')
     .classed('key-label', true);
   keyLabels.transition().duration(duration)
-    .text(function(d) { return d; })
-    .attr('x', function(d,i) { return i * vis.keyWidth})
-    .attr('y', vis.keyRectHeight*3);
+    .text(function(d, i) { 
+      if (i == colors.domain().length - 1) return d +'+';
+      return d; 
+    })
+    .attr('x', function(d,i) { return i * vis.keyWidth + 2;})
+    .attr('y', vis.keyLabelOffset());
     
   
   vis.states = vis.graph.selectAll('path')
