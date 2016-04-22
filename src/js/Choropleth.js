@@ -1,3 +1,7 @@
+/*--------------------*
+ *** INITIALIZATION ***
+ *--------------------*/
+
 /**
  * Creates a new choropleth
  *
@@ -48,10 +52,12 @@ Choropleth.prototype.eventHandler = function(handler) {
 Choropleth.prototype.initVis = function() {
   var vis = this;
   
-  /* ** CREATE DRAWING AREA ** */
+  /* DRAWING PARAMETERS */
   vis.margin = { top: 100, right: 20, bottom: 20, left: 20 };
   vis.keyHeight = 80;
   vis.keyRectHeight = 20;
+  
+  /* ** CREATE DRAWING AREA ** */
   vis.svg = d3.select('#'+vis.parentElem).append('svg')
     .classed('us-map', true);
   vis.graph = vis.svg.append('g');
@@ -71,12 +77,10 @@ Choropleth.prototype.initVis = function() {
   return vis;
 }
 
-/**
- * Responds to resize events by calling the visualization's resize method
- */
-Choropleth.prototype.handleResize = function(event) {
-  this.resize();
-}
+
+/*------------*
+ *** SIZING ***
+ *------------*/
 
 /**
  * Resizes the visualization and redraws it within its parent element.
@@ -86,27 +90,36 @@ Choropleth.prototype.handleResize = function(event) {
 Choropleth.prototype.resize = function() {
   var vis = this;
   
+  /* set width and height based on container */
   vis.width = parseInt(d3.select('#'+vis.parentElem).style('width')) - vis.margin.left - vis.margin.right;
-  vis.height = vis.width * .85 - vis.margin.top - vis.margin.bottom;
+  vis.height = vis.width * .8 - vis.margin.top - vis.margin.bottom;
+  vis.sizeGroup = (vis.width > 468) ? 'medium' : 'small';
   
+  /* update margin transformations */
   vis.svg.attr('width', vis.width + vis.margin.left + vis.margin.right)
     .attr('height', vis.height + vis.margin.top + vis.margin.bottom + vis.keyHeight);
     
-  vis.key.attr('transform', 'translate(0,40)');
+  vis.key.attr('transform', 'translate(0,10)');
   vis.keyTitle.attr('x', vis.width/2)
     .attr('y', 10);
       
   vis.graph.attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
+  
+  /* Rescale drawing parameters */
   vis.keyWidth = Math.floor((1/6)*vis.width);
-    
   vis.projection.scale(vis.width * 1.35)
     .translate([vis.width/2, vis.height/2]);
     
-  vis.update({ duration: 0, });
+  vis.update({ duration: 0 });
   
   return vis;
 }
 
+/**
+ * Returns the correct offset based on the visualization's current size group
+ *
+ * @return Number
+ */
 Choropleth.prototype.keyLabelOffset = function() {
   if (this.sizeGroup == 'medium') {
     return 55;
@@ -115,6 +128,11 @@ Choropleth.prototype.keyLabelOffset = function() {
   }
 }
 
+/**
+ * Returns the correct font size based on the visualizations current size group
+ *
+ * @return String
+ */
 Choropleth.prototype.fontSize = function() {
   if (this.sizeGroup == "medium") {
     return '14px';
@@ -123,7 +141,17 @@ Choropleth.prototype.fontSize = function() {
   }
 }
 
-
+/*---------------------------*
+ *** DRAWING VISUALIZATION ***
+ *---------------------------*/
+ 
+/**
+ * Coerces data into an array the state's ID and death rate.
+ * Accepted Options:
+ *  years: Array of date objects, first date should be the year for death rate 
+ *
+ * @param options The options for wrangling data
+ */
 Choropleth.prototype.wrangleData = function(options) {
   var deathRateYear;
   if (!options || !options.years) {
@@ -145,12 +173,6 @@ Choropleth.prototype.wrangleData = function(options) {
   });
 }
 
-/**
- * Handles update events by calling the visualizations update method
- */
-Choropleth.prototype.handleUpdate = function(event) {
-  this.update(event.options);
-}
 
 /**
  * Updates the visualization according to the new data year
@@ -188,7 +210,8 @@ Choropleth.prototype.update = function(options) {
       return d; 
     })
     .attr('x', function(d,i) { return i * vis.keyWidth + 2;})
-    .attr('y', vis.keyLabelOffset());
+    .attr('y', vis.keyLabelOffset())
+    .attr('font-size', vis.fontSize());
     
   
   vis.states = vis.graph.selectAll('path')
@@ -204,6 +227,25 @@ Choropleth.prototype.update = function(options) {
       return colors(vis.displayData[i].death_rate); });
   
   return vis;
+}
+
+
+/*--------------------*
+ *** EVENT HANDLERS ***
+ *--------------------*/
+
+/**
+ * Responds to resize events by calling the visualization's resize method
+ */
+Choropleth.prototype.handleResize = function(event) {
+  this.resize();
+}
+
+/**
+ * Handles update events by calling the visualizations update method
+ */
+Choropleth.prototype.handleUpdate = function(event) {
+  this.update(event.options);
 }
 
 /**

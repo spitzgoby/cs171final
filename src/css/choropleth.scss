@@ -1,4 +1,5 @@
 $highlight-color: #E65252;
+$axis-font-family: 'Helvetica-neue', sans-serif;
 
 /*----------------*
  *** CHOROPLETH ***
@@ -18,5 +19,17 @@ $highlight-color: #E65252;
   .key-rect {
     stroke: #666;
     stroke-width: 0.5;
+  }
+}
+
+.key {
+  .key-label {
+    font-family: $axis-font-family;    
+    font-weight: lighter;
+  }
+  
+  .key-title {
+    fill: #333;
+    font-weight: bold;
   }
 }
