@@ -1,3 +1,8 @@
+
+/*--------------------*
+ *** INITIALIZATION ***
+ *--------------------*/
+
 /**
  * Creates a new Scatterplot visualization
  *
@@ -23,7 +28,7 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
     },
     'median_income': {
       data: income,
-      name: 'Median Income',
+      name: 'Median Income (1000 USD)',
       domain: [
         d3.min(income, function(d) { return d3.min(d.years, function(d) {return d.median_income; }); }),
         d3.max(income, function(d) { return d3.max(d.years, function(d) {return d.median_income; }); })
@@ -46,6 +51,7 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
   this.displayData = {};
   this.regression = new Regression();
   
+  this.sizeGroup = "medium";
   this.default = {
     duration: 1000
   }
@@ -120,7 +126,6 @@ Scatterplot.prototype.initVis = function() {
     
   vis.yAxis = d3.svg.axis()
     .scale(vis.y)
-    .ticks(10)
     .orient('left');
     
   vis.xTitle = vis.xAxisG.append('text')
@@ -139,13 +144,18 @@ Scatterplot.prototype.initVis = function() {
   return vis;
 }
 
-/**
- * Handles 'resize' events by calling the visualizations resize method. 
- *
- * @param event The event object
- */
-Scatterplot.prototype.handleResize = function(event) {
-  this.resize();
+/*------------*
+ *** SIZING ***
+ *------------*/
+
+Scatterplot.prototype.labelFontSize = function() {
+  if (this.sizeGroup == 'medium') return '10pt'; 
+  return '8pt';
+}
+
+Scatterplot.prototype.yAxisTicks = function() {
+  if (this.sizeGroup == 'medium') return 10;
+  return 4;
 }
 
 /**
@@ -159,6 +169,9 @@ Scatterplot.prototype.resize = function() {
   // grab width of current container
   vis.width = parseInt(d3.select('#'+vis.parentElem).style('width')) - vis.margin.left - vis.margin.right;
   vis.height = vis.width;
+  
+  // update size group
+  vis.sizeGroup = (vis.width > 256) ? 'medium' : 'small';
     
   // resize svg, reset margin
   vis.svg.attr('width', vis.width + vis.margin.left + vis.margin.right)
@@ -166,7 +179,8 @@ Scatterplot.prototype.resize = function() {
   vis.graph.attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
   
   vis.title.attr('x', vis.width/2)
-    .attr('y', 6);
+    .attr('y', 6)
+    .attr('font-size', vis.labelFontSize());
   // change scale drawing range
   vis.x.range([vis.padding.x, vis.width-vis.padding.x]);
   vis.y.range([vis.height-vis.padding.y, vis.padding.y]);
@@ -174,6 +188,8 @@ Scatterplot.prototype.resize = function() {
   vis.xAxisG.attr('transform', 'translate(0, '+ vis.height +')');
   vis.xTitle.attr('x', vis.width/2)
     .attr('y', vis.margin.bottom-2);
+    
+  vis.yAxis.ticks(vis.yAxisTicks());
   vis.yTitle.attr('x', -vis.width/2)
     .attr('y', -vis.margin.left * (3/4) );
   
@@ -183,6 +199,11 @@ Scatterplot.prototype.resize = function() {
   // return vis for chaining
   return vis;
 }
+
+
+/*---------------------------*
+ *** DRAWING VISUALIZATION ***
+ *---------------------------*/
 
 /**
  * Filters the visualizations data by year according to the given options 
@@ -235,15 +256,6 @@ Scatterplot.prototype.wrangleData = function(options) {
 }
 
 /**
- * Handles 'update' events by calling the visualizations 'update' method
- *
- * @param event The event object created by the object that fired the event
- */
-Scatterplot.prototype.handleUpdate = function(event) {
-  this.update(event.options);
-}
-
-/**
  * Updates the visualization by updating display data according to the given
  * options and redrawing the scatterplot accordingly.
  * Accepted Options:
@@ -267,11 +279,13 @@ Scatterplot.prototype.update = function(options) {
   // redraw axes
   vis.xTitle
     .html(vis.data[vis.factor].name +
-      ' <tspan class="factor">('+ formatYear(vis.factorYear) +')</tspan>');
+      ' <tspan class="factor">('+ formatYear(vis.factorYear) +')</tspan>')
+    .attr('font-size', vis.labelFontSize());
     
   vis.yTitle
     .html(vis.data.death_rate.name +
-      ' <tspan class="death_rate">('+ formatYear(vis.deathRateYear) +')</tspan>');
+      ' <tspan class="death_rate">('+ formatYear(vis.deathRateYear) +')</tspan>')
+    .attr('font-size', vis.labelFontSize());
   
   
   vis.xAxisG.transition().duration(duration)
@@ -312,6 +326,29 @@ Scatterplot.prototype.update = function(options) {
     .attr('x2', function(d) { return vis.x(d.x2); })
     .attr('y2', function(d) { return vis.y(d.y2); });
 }
+
+/*--------------------*
+ *** EVENT HANDLERS ***
+ *--------------------*/
+
+/**
+ * Handles 'resize' events by calling the visualizations resize method. 
+ *
+ * @param event The event object
+ */
+Scatterplot.prototype.handleResize = function(event) {
+  this.resize();
+}
+ 
+/**
+ * Handles 'update' events by calling the visualizations 'update' method
+ *
+ * @param event The event object created by the object that fired the event
+ */
+Scatterplot.prototype.handleUpdate = function(event) {
+  this.update(event.options);
+}
+
 
 /**
  * Draws a red ring around highlighted dot and increases its size
