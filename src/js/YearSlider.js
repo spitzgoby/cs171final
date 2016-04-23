@@ -4,6 +4,19 @@ function YearSlider(parentElem, range) {
   this.years = d3.range(range[0], range[1]+1);
   this.topYear = range[1];
   this.bottomYear = range[1];
+  
+  this.colors = {
+    markers: {
+      top: {
+        hover: '#756BB1',
+        normal: '#54278F'
+      },
+      bottom: {
+        hover: '#6CD16C',
+        normal: '#23A923' 
+      }
+    }
+  };
 }
 
 YearSlider.prototype.eventHandler = function(handler) {
@@ -149,8 +162,10 @@ YearSlider.prototype.updateMarkers = function() {
   // enter
   topMarker.enter()
     .append('circle')
-      .attr('fill', '#54278F')
+      .attr('fill', vis.colors.markers.top.normal)
       .attr('r', vis.marker.radius)
+      .on('mouseover', function() {vis.changeMarkerColor(topMarker, vis.colors.markers.top.hover);})
+      .on('mouseout', function() {vis.changeMarkerColor(topMarker, vis.colors.markers.top.normal);})
       .call(vis.dragTopMarker);
   // update  
   topMarker.transition().duration(250)
@@ -160,12 +175,18 @@ YearSlider.prototype.updateMarkers = function() {
   // enter
   bottomMarker.enter()
     .append('circle')
-      .attr('fill', '#23A923')
+      .attr('fill', vis.colors.markers.bottom.normal)
       .attr('r', vis.marker.radius)
+      .on('mouseover', function() {vis.changeMarkerColor(bottomMarker, vis.colors.markers.bottom.hover);})
+      .on('mouseout', function() {vis.changeMarkerColor(bottomMarker, vis.colors.markers.bottom.normal);})
       .call(vis.dragBottomMarker);
   // update
   bottomMarker.transition().duration(250)
     .attr('cx', vis.x);
+}
+
+YearSlider.prototype.changeMarkerColor = function(marker, color) {
+  marker.attr('fill', color);
 }
 
 YearSlider.prototype.handleResize = function(event) {

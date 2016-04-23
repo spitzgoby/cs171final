@@ -57,7 +57,7 @@ function loadData(error, topo, deaths, income, unemployment) {
     // convert income data from strings to numbers and dates
     income.forEach(function(state) {
       state.years.forEach(function(year) {
-        year.median_income = +year.median_income,
+        year.median_income = +year.median_income / 1000,
         year.year = parseYear(year.year)
       });
     });
