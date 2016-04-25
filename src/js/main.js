@@ -3,6 +3,9 @@
 var formatYear = d3.time.format('%Y');
 var parseYear = formatYear.parse;
 
+var formatPercent = d3.format('%');
+var formatIdentity = function(str) { return str; };
+
 // universal color scale
 colorbrewer.Purples[6].unshift('#ffffff');
 var colors = d3.scale.quantile()
