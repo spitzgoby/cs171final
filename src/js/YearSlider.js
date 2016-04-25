@@ -51,16 +51,6 @@ YearSlider.prototype.initVis = function() {
   vis.svg = d3.select('#'+vis.parentElem).append('svg');
   vis.slider = vis.svg.append('g');
   
-  /*** SLIDER TEXT ***/
-  vis.topText = vis.slider.append('text')
-    .classed('axis-label top', true)
-    .text('Death Rate')
-    .attr('text-anchor', 'middle');
-  vis.bottomText = vis.slider.append('text')
-    .classed('axis-label bottom', true)
-    .text('Factor Data')
-    .attr('text-anchor', 'middle');
-  
   /*** SCALE ***/
   vis.x = d3.scale.linear()
     .domain(vis.range);
@@ -76,6 +66,16 @@ YearSlider.prototype.initVis = function() {
     
   vis.topAxisLine = vis.topAxis.append('line').attr('stroke-width', 4);
   vis.bottomAxisLine = vis.bottomAxis.append('line').attr('stroke-width', 4);
+  
+  /*** SLIDER TEXT ***/
+  vis.topText = vis.topSlider.append('text')
+    .classed('axis-label top', true)
+    .text('Death Rate')
+    .attr('text-anchor', 'middle');
+  vis.bottomText = vis.bottomSlider.append('text')
+    .classed('axis-label bottom', true)
+    .text('Factor Data')
+    .attr('text-anchor', 'middle');
   
   vis.questionButton = vis.slider.append('text')
     .classed('slider question', true)
@@ -122,9 +122,9 @@ YearSlider.prototype.resize = function() {
     .attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
     
   vis.topText.attr('x', vis.width/2)
-    .attr('y', 10);
+    .attr('y', -15);
   vis.bottomText.attr('x', vis.width/2)
-    .attr('y', 95);
+    .attr('y', 25);
   /*** UPDATE SCALE ***/
   vis.x.range([0, vis.width]);
   
