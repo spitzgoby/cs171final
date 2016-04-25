@@ -71,7 +71,7 @@ Choropleth.prototype.initVis = function() {
   vis.projection = d3.geo.albersUsa();
   vis.path = d3.geo.path()
     .projection(vis.projection);
-    
+  
   vis.resize();
   // return vis for chaining
   return vis;
@@ -274,9 +274,10 @@ Choropleth.prototype.unhighlightState = function(d) {
  * @return Choropleth
  */
 Choropleth.prototype.drawHighlight = function(d) {
-  this.states.filter(function(state) { return state.id == d.id})
+  var vis = this;
+  vis.states.filter(function(state) { return state.id == d.id})
     .classed('highlighted', true);
-  return this;
+  return vis;
 }
 
 /**
@@ -286,8 +287,10 @@ Choropleth.prototype.drawHighlight = function(d) {
  * @return Choropleth
  */
 Choropleth.prototype.removeHighlight = function(d) {
+  var vis = this;
   this.states.filter(function(state) { return state.id == d.id; })
     .classed('highlighted', false);
-  return this;
+  return vis;
 }
+
 
