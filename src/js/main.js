@@ -93,6 +93,7 @@ function createVis(topo, deaths, income, unemployment) {
   
   yearSlider = new YearSlider('year-slider', [2002, 2014]);
   yearSlider.eventHandler(handler).initVis();
+  handler.on('question-clicked', this, displaySliderDescription);
 }
 
 // updates the visualizations size within the dom
@@ -112,4 +113,8 @@ function updateFactor(factor) {
     
     handler.broadcast({ name: 'update', options: options});
   }
+}
+
+function displaySliderDescription() {
+  $('#slider-modal').modal();
 }

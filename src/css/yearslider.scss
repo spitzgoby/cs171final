@@ -1,9 +1,39 @@
 #year-slider {
+  margin-top: 10px;  
+  
+  .axis-label {
+    font-weight: bold;
+  }
+  .top {
+    fill: #54278F;
+    circle:hover {
+      fill: #756BB1;
+    }
+  }
+  
+  .bottom {
+    fill: #23A923;
+    circle:hover {
+      fill: #6CD16C;
+    }
+  }
+  
+  circle:hover {
+    cursor: pointer;  
+  }
+  
   .years {
     text {
       font-family: 'Helvetica-neue', sans-serif;
-      font-size: 9pt;
+      font-size: 8pt;
       pointer-events: none;
     }
+  }
+  
+  .question {
+    font-family: FontAwesome;
+    &:hover {
+      cursor: pointer;
+    }  
   }
 }

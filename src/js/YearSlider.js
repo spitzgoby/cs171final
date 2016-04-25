@@ -19,6 +19,15 @@ function YearSlider(parentElem, range) {
   };
 }
 
+YearSlider.prototype.question = function(text) {
+  if (text) {
+    this.descriptiveText = text;
+    return this;
+  }
+  
+  return this.descriptiveText;
+}
+
 YearSlider.prototype.eventHandler = function(handler) {
   if (handler) {
     this._eventHandler = handler;
@@ -44,9 +53,11 @@ YearSlider.prototype.initVis = function() {
   
   /*** SLIDER TEXT ***/
   vis.topText = vis.slider.append('text')
+    .classed('axis-label top', true)
     .text('Death Rate')
     .attr('text-anchor', 'middle');
   vis.bottomText = vis.slider.append('text')
+    .classed('axis-label bottom', true)
     .text('Factor Data')
     .attr('text-anchor', 'middle');
   
@@ -65,6 +76,11 @@ YearSlider.prototype.initVis = function() {
     
   vis.topAxisLine = vis.topAxis.append('line').attr('stroke-width', 4);
   vis.bottomAxisLine = vis.bottomAxis.append('line').attr('stroke-width', 4);
+  
+  vis.questionButton = vis.slider.append('text')
+    .classed('slider question', true)
+    .html('&#xf29c')
+    .on('click', function(d) {vis.questionClicked();});
   
   vis.yearsText.selectAll('text')
     .data(vis.years).enter()
@@ -108,7 +124,7 @@ YearSlider.prototype.resize = function() {
   vis.topText.attr('x', vis.width/2)
     .attr('y', 10);
   vis.bottomText.attr('x', vis.width/2)
-    .attr('y', 100);
+    .attr('y', 95);
   /*** UPDATE SCALE ***/
   vis.x.range([0, vis.width]);
   
@@ -128,6 +144,9 @@ YearSlider.prototype.resize = function() {
     
   vis.yearsText.selectAll('text')
     .attr('y', function(d) { return -vis.x(d) + 4; });
+  
+  vis.questionButton.attr('x', vis.width)
+    .attr('y', vis.height + 5);
   
   // update visualization now that size is set
   vis.update();
@@ -162,7 +181,6 @@ YearSlider.prototype.updateMarkers = function() {
   // enter
   topMarker.enter()
     .append('circle')
-      .attr('fill', vis.colors.markers.top.normal)
       .attr('r', vis.marker.radius)
       .on('mouseover', function() {vis.changeMarkerColor(topMarker, vis.colors.markers.top.hover);})
       .on('mouseout', function() {vis.changeMarkerColor(topMarker, vis.colors.markers.top.normal);})
@@ -175,7 +193,6 @@ YearSlider.prototype.updateMarkers = function() {
   // enter
   bottomMarker.enter()
     .append('circle')
-      .attr('fill', vis.colors.markers.bottom.normal)
       .attr('r', vis.marker.radius)
       .on('mouseover', function() {vis.changeMarkerColor(bottomMarker, vis.colors.markers.bottom.hover);})
       .on('mouseout', function() {vis.changeMarkerColor(bottomMarker, vis.colors.markers.bottom.normal);})
@@ -236,19 +253,11 @@ YearSlider.prototype.markerEndedDragging = function(d) {
   });
 }
 
-
-YearSlider.prototype.handleLagDragStart = function(d) {
-  // set initial parameters
-}
-
-YearSlider.prototype.handleLagDrag = function(d) {
-  // redraw lag box and markers
-  // should not extend past edge of svg
-}
-
-YearSlider.prototype.handleLagDragEnd = function(d) {
-  // set new year values and animate transition to stopping point
-  // broadcast new year values
+YearSlider.prototype.questionClicked = function() {
+  this.eventHandler().broadcast({
+    name:'question-clicked',
+    options: {}
+  });
 }
 
 
