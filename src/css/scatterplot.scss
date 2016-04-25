@@ -49,8 +49,13 @@ $highlight-color: #E65252;
 /* SCATTERPLOT */
 #scatterplot {
   .best-fit {
-    stroke-width: 2px;
+    stroke-width: 3px;
     stroke: $factor-color;
+    
+    &.highlighted {
+      stroke-width: 6px;
+      stroke: $factor-light-color;
+    }
   }
   
   circle.dot {

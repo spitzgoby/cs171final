@@ -351,13 +351,13 @@ Scatterplot.prototype.update = function(options) {
   var bflData = [{x1: vis.x.domain()[0], y1: coeff[1],
                   x2: vis.x.domain()[1], y2: coeff[0] * vis.x.domain()[1] + coeff[1],
                   correlation: Math.sqrt(coeff[2])}];
-  var regLine = vis.bfl.selectAll('line').data(bflData);
+  vis.regLine = vis.bfl.selectAll('line').data(bflData);
   // append best fit line (if necessary) or redraw with new data
-  regLine.enter().append('line')
+  vis.regLine.enter().append('line')
     .classed('best-fit', true)
-    .on('mouseover', vis.bflTip.show)
-    .on('mouseout', vis.bflTip.hide);
-  regLine.transition().duration(duration)
+    .on('mouseover', function(d) { vis.highlightBFL(d); })
+    .on('mouseout', function(d) { vis.unhighlightBFL(d); });
+  vis.regLine.transition().duration(duration)
     .attr('x1', function(d) { return vis.x(d.x1); })
     .attr('y1', function(d) { return vis.y(d.y1); }) 
     .attr('x2', function(d) { return vis.x(d.x2); })
@@ -416,6 +416,16 @@ Scatterplot.prototype.removeHighlight = function(d) {
   vis.stateTip.hide();
   // return vis for chaining
   return vis;
+}
+
+Scatterplot.prototype.highlightBFL = function(d) {
+  this.regLine.classed('highlighted', true);
+  this.bflTip.show(d);  
+}
+
+Scatterplot.prototype.unhighlightBFL = function(d) {
+  this.regLine.classed('highlighted', false);
+  this.bflTip.hide();
 }
 
 /**
