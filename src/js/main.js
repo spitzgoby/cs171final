@@ -4,6 +4,7 @@ var formatYear = d3.time.format('%Y');
 var parseYear = formatYear.parse;
 
 var formatPercent = d3.format('%');
+var formatDecimal = d3.format('.2');
 var formatIdentity = function(str) { return str; };
 
 // universal color scale
@@ -15,19 +16,6 @@ var colors = d3.scale.quantile()
  *** LOAD AND PARSE DATA ***
  ***---------------------***/
   
-// used by scatterplot and choropleth
-// function percentageDelta(years, factor) {
-//   var first = years[0],
-//       last = years[years.length - 1];
-//   var delta = (last[factor]- first[factor]) / first[factor];
-//   return delta;
-// }
-// 
-// function average(years, factor) {
-//   var total = years.reduce(function(prev, current) { return prev + current[factor];}, 0);
-//   return total / years.length;
-// }
-
 // load all data before cleaning
 var dataLoaded = false;
 d3_queue.queue()
@@ -98,12 +86,6 @@ function createVis(topo, deaths, income, unemployment) {
   yearSlider.eventHandler(handler).initVis();
   handler.on('question-clicked', this, displaySliderDescription);
 }
-
-// updates the visualizations size within the dom
-// function resize() {
-//   choropleth.resize();
-//   scatterplot.resize();
-// }
 
 // update visualizations based on selected options
 function updateFactor(factor) {
