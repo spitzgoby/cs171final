@@ -21,6 +21,7 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
     'death_rate': {
       data: deaths,
       name: 'Deaths Per 100,000',
+      format: formatIdentity,
       domain: [
         d3.min(deaths, function(d) { return d3.min(d.years, function(d) {return d.death_rate; }); }),
         d3.max(deaths, function(d) { return d3.max(d.years, function(d) {return d.death_rate; }); })
@@ -29,6 +30,7 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
     'median_income': {
       data: income,
       name: 'Median Income (1000 USD)',
+      format: formatIdentity,
       domain: [
         d3.min(income, function(d) { return d3.min(d.years, function(d) {return d.median_income; }); }),
         d3.max(income, function(d) { return d3.max(d.years, function(d) {return d.median_income; }); })
@@ -37,6 +39,7 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
     'unemployment': {
       data: unemployment,
       name: 'Unemployment Rate',
+      format: formatPercent,
       domain: [
         d3.min(unemployment, function(d) { return d3.min(d.years, function(d) {return d.unemployment; }); }),
         d3.max(unemployment, function(d) { return d3.max(d.years, function(d) {return d.unemployment; }); })
@@ -137,6 +140,20 @@ Scatterplot.prototype.initVis = function() {
     .attr('transform', 'rotate(-90)')
     .attr('text-anchor', 'middle')
     .text('Deaths per 100,000');
+    
+  vis.tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .direction('s')
+    .offset([5,0])
+    .html(function(d) {
+      return ''+
+        '<h4>'+ d.id +'</h4><p>'+
+          '<span class="tip-header">Death Rate: <span class="death-rate">'+ 
+            d.death_rate +'</span></span><br>'+
+          '<span class="tip-header">'+ vis.data[vis.factor].name +
+            ': <span class="factor">'+ vis.data[vis.factor].format(d.factor) +'</span></span></p>';
+    });
+  vis.graph.call(vis.tip);
   
   vis.resize();
   
@@ -287,7 +304,7 @@ Scatterplot.prototype.update = function(options) {
       ' <tspan class="death_rate">('+ formatYear(vis.deathRateYear) +')</tspan>')
     .attr('font-size', vis.labelFontSize());
   
-  
+  vis.xAxis.tickFormat(vis.data[vis.factor].format);
   vis.xAxisG.transition().duration(duration)
     .call(vis.xAxis);
   vis.yAxisG.transition().duration(duration)
@@ -356,11 +373,13 @@ Scatterplot.prototype.handleUpdate = function(event) {
  * @return Scatterplot
  */
 Scatterplot.prototype.drawHighlight = function(d) {
-  this.dots.filter(function(state) { return state.id == d.id; })
+  var vis = this;
+  vis.dots.filter(function(state) { return state.id == d.id; })
     .classed('highlighted', true)
     .attr('r', 10);
+  vis.tip.show(vis.displayData[vis.stateIndex(d)]);
   // return vis for chaining
-  return this;
+  return vis;
 }
 
 /**
@@ -370,11 +389,13 @@ Scatterplot.prototype.drawHighlight = function(d) {
  * @return Scatterplot
  */
 Scatterplot.prototype.removeHighlight = function(d) {
-  this.dots.filter(function(state) { return state.id == d.id; })
+  var vis = this;
+  vis.dots.filter(function(state) { return state.id == d.id; })
     .classed('highlighted', false)
     .attr('r', 5);
+  vis.tip.hide();
   // return vis for chaining
-  return this;
+  return vis;
 }
 
 /**
@@ -393,4 +414,11 @@ Scatterplot.prototype.highlightState = function(d) {
  */
 Scatterplot.prototype.unhighlightState = function(d) {
   this.removeHighlight(d).eventHandler().broadcast({ name: 'mouseoutState', id: d.id }, this);
+}
+
+Scatterplot.prototype.stateIndex = function(d) {
+  for (var i = 0; i < this.displayData.length; i++) {
+    if (this.displayData[i].id == d.id) return i;
+  }
+  return 0;
 }
