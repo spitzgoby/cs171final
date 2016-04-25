@@ -29,8 +29,9 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
     },
     'median_income': {
       data: income,
-      name: 'Median Income (1000 USD)',
-      format: formatIdentity,
+      name: 'Median Income ($1000)',
+      shortName: 'Median Income',
+      format: formatDecimal,
       domain: [
         d3.min(income, function(d) { return d3.min(d.years, function(d) {return d.median_income; }); }),
         d3.max(income, function(d) { return d3.max(d.years, function(d) {return d.median_income; }); })
@@ -39,6 +40,7 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
     'unemployment': {
       data: unemployment,
       name: 'Unemployment Rate',
+      shortName: 'Unemployment Rate',
       format: formatPercent,
       domain: [
         d3.min(unemployment, function(d) { return d3.min(d.years, function(d) {return d.unemployment; }); }),
@@ -141,7 +143,7 @@ Scatterplot.prototype.initVis = function() {
     .attr('text-anchor', 'middle')
     .text('Deaths per 100,000');
     
-  vis.tip = d3.tip()
+  vis.stateTip = d3.tip()
     .attr('class', 'd3-tip')
     .direction('s')
     .offset([5,0])
@@ -153,7 +155,21 @@ Scatterplot.prototype.initVis = function() {
           '<span class="tip-header">'+ vis.data[vis.factor].name +
             ': <span class="factor">'+ vis.data[vis.factor].format(d.factor) +'</span></span></p>';
     });
-  vis.graph.call(vis.tip);
+  vis.graph.call(vis.stateTip);
+  
+  vis.bflTip = d3.tip()
+    .attr('class', 'd3-tip')
+    .direction('s')
+    .offset([5,0])
+    .html(function(d) {
+      return ''+
+        '<span class="tip-header">Death Rate <span class="tip-death-rate">('
+          + formatYear(vis.deathRateYear) +')</span></span><br>'+
+        '<span class="tip-header">'+ vis.data[vis.factor].shortName +
+          ' <span class="tip-factor">('+ formatYear(vis.factorYear) +')</span></span><br>'+
+        '<span class="tip-header">Correlation: '+ formatDecimal(d.correlation.toFixed(2)) +'</span>';
+    });
+  vis.graph.call(vis.bflTip);
   
   vis.resize();
   
@@ -333,10 +349,14 @@ Scatterplot.prototype.update = function(options) {
   
   // calculate best fit line path
   var bflData = [{x1: vis.x.domain()[0], y1: coeff[1],
-                  x2: vis.x.domain()[1], y2: coeff[0] * vis.x.domain()[1] + coeff[1]}];
+                  x2: vis.x.domain()[1], y2: coeff[0] * vis.x.domain()[1] + coeff[1],
+                  correlation: Math.sqrt(coeff[2])}];
   var regLine = vis.bfl.selectAll('line').data(bflData);
   // append best fit line (if necessary) or redraw with new data
-  regLine.enter().append('line').classed('best-fit', true);
+  regLine.enter().append('line')
+    .classed('best-fit', true)
+    .on('mouseover', vis.bflTip.show)
+    .on('mouseout', vis.bflTip.hide);
   regLine.transition().duration(duration)
     .attr('x1', function(d) { return vis.x(d.x1); })
     .attr('y1', function(d) { return vis.y(d.y1); }) 
@@ -377,7 +397,7 @@ Scatterplot.prototype.drawHighlight = function(d) {
   vis.dots.filter(function(state) { return state.id == d.id; })
     .classed('highlighted', true)
     .attr('r', 10);
-  vis.tip.show(vis.displayData[vis.stateIndex(d)]);
+  vis.stateTip.show(vis.displayData[vis.stateIndex(d)]);
   // return vis for chaining
   return vis;
 }
@@ -393,7 +413,7 @@ Scatterplot.prototype.removeHighlight = function(d) {
   vis.dots.filter(function(state) { return state.id == d.id; })
     .classed('highlighted', false)
     .attr('r', 5);
-  vis.tip.hide();
+  vis.stateTip.hide();
   // return vis for chaining
   return vis;
 }

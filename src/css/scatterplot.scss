@@ -1,6 +1,10 @@
+/* fonts */
 $factor-button-font: 'Helvetica-neue', sans-serif;
-$factor-color: #23A923;
+/* colors */
 $death-color:  #54278F;
+$death-light-color: #756BB1;
+$factor-color: #23A923;
+$factor-light-color: #6CD16C;
 $highlight-color: #E65252;
 
 /*-------------------------*
@@ -68,3 +72,14 @@ $highlight-color: #E65252;
   }
 } 
  
+/*-------------*
+ *** BFL TIP ***
+ *-------------*/
+
+.tip-factor {
+  color: $factor-light-color;
+}
+
+.tip-death-rate {
+  color: $death-light-color;
+}
