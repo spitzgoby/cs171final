@@ -153,21 +153,20 @@ Choropleth.prototype.fontSize = function() {
  * @param options The options for wrangling data
  */
 Choropleth.prototype.wrangleData = function(options) {
-  var deathRateYear;
+  var vis = this;
   if (!options || !options.years) {
-    deathRateYear = parseYear('2014');
+    vis.deathRateYear = parseYear('2014');
   } else {
-    deathRateYear = options.years[0];
+    vis.deathRateYear = options.years[0];
   }
   
-  var vis = this;
   // empty object to hold filtered data
   vis.displayData = vis.data.map(function(state) {
     // filter out years falling beyond given date range
     return {
       id: state.id,
       death_rate: state.years.reduce(function(prev, year) {
-        return prev + (year.year.getTime() == deathRateYear.getTime() ? year.death_rate : 0);
+        return prev + (year.year.getTime() == vis.deathRateYear.getTime() ? year.death_rate : 0);
       }, 0)
     };
   });
@@ -191,6 +190,10 @@ Choropleth.prototype.update = function(options) {
   var duration = options.duration ? options.duration : vis.default.duration;
   // change colors domain
   colors.domain([0, 1, 5, 10, 15, 20]);
+  
+  vis.keyTitle.html('Deaths Per 100,000 <tspan class="death-rate-year">('+ 
+    formatYear(vis.deathRateYear) +')</tspan>');
+  
   var keyRects = vis.key.selectAll('rect').data(colors.domain());
   keyRects.enter().append('rect')
     .classed('key-rect', true);
