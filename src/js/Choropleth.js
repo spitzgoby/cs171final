@@ -53,7 +53,7 @@ Choropleth.prototype.initVis = function() {
   var vis = this;
   
   /* DRAWING PARAMETERS */
-  vis.margin = { top: 100, right: 20, bottom: 20, left: 20 };
+  vis.margin = { top: 40, right: 20, bottom: 20, left: 20 };
   vis.keyHeight = 80;
   vis.keyRectHeight = 20;
   

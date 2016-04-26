@@ -5,6 +5,7 @@
   <title>Substance Abuse Data View</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/style.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 </head>
 <body>
   
@@ -27,7 +28,7 @@
         </div><!-- col-sm-8 -->
         <div class="col-sm-4">
           <div id="scatterplot"></div>
-          <div id="viz-controls">
+          <div class="viz-controls">
             <div class="btn-group-justified btn-group">
               <div class="btn-group" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-factor active" 
@@ -63,6 +64,15 @@
         </div><!-- col-sm-4 -->
       </div><!-- visualizations -->    
     </div><!-- row -->
+    
+    <div class="row">
+      <div class="col-sm-offset-1 col-sm-10">
+        <div id="treemap-area"></div>
+        <div class="viz-controls">
+          <button type="button" value="clickme" class="btn btn-factor" onclick="changeToOther();">Switch View</button>
+        </div>
+      </div>  
+    </div>
   </div><!-- fluid-container -->
   
   <script src="js/libs.min.js"></script>
@@ -73,7 +83,8 @@
         $('.btn-factor').removeClass('active');
         $(this).addClass('active');
         updateFactor($(this).data('factor'));
-      })
+      });
+      loadTreemap();
     });
   </script>  
 </body>
