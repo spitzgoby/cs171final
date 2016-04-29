@@ -103,23 +103,59 @@
                 </button>
               </div><!-- unemployment button -->
             </div><!-- btn-group-justified -->
-            <div id="year-slider"></div>
+            <div id="year-slider"><!-- Year Slider Goes Here --></div>
+            <!-- Explanatory text -->
             <div id="slider-modal" class="modal fade" tabindex="-1" role="dialog">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Year Slider</h4>
+                    <h4 class="modal-title"><span class="death_rate">Death Rate</span> and <span class="factor">Factor</span> Year Slider</h4>
                   </div>
                   <div class="modal-body">
-                    <p>The year slider is great</p>
+                    <p> It takes some time before economic factors begin to have 
+                      an effect on death rates. A person may begin using drugs 
+                      as the result of job loss and not pass away for several years.
+                      Conversely an upswing in median income would take several 
+                      years to manifest in itself in lower death rates. The 
+                      slider allows you to compare economic factors from one 
+                      year against death rates from a different year.<br>
+                      <hr>
+                      <strong>Here are some interesting correlations that we found in 
+                      the data:</strong></p>
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>Death Rate</th>
+                            <th>Economic Factor</th>
+                            <th>Correlation</th>
+                            <th>Notes</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>2010</td>
+                            <td>Median Income (2008)</td>
+                            <td>-0.34</td>
+                            <td>After the economic recession in 2008</td>
+                          </tr>
+                          <tr>
+                            <td>2010-2014</td>
+                            <td>Unemployment Rate (2008)</td>
+                            <td>>0.2</td>
+                            <td>Correlation is stable from 2010 to 2014</td>
+                          </tr>
+                        </tbody>
+                        <tfoot></tfoot>
+                      </table>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-factor" data-dismiss="modal">Okay</button>
                   </div>
-                </div><!-- /.modal-content -->
-              </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                </div><!-- modal-content -->
+              </div><!-- modal-dialog -->
+            </div><!-- modal -->
+            
           </div><!-- viz-controls -->
         </div><!-- col-sm-4 -->
       </div><!-- visualizations -->    

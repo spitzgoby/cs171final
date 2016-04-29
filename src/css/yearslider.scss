@@ -1,3 +1,8 @@
+$death-color:  #54278F;
+$death-light-color: #756BB1;
+$factor-color: #23A923;
+$factor-light-color: #6CD16C;
+
 #year-slider {
   margin-top: 10px;  
   
@@ -35,5 +40,21 @@
     &:hover {
       cursor: pointer;
     }  
+  }
+}
+
+#slider-modal {
+  .factor {
+    color: white;
+    background-color: $factor-color;  
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  
+  .death_rate {
+    color: white;
+    background-color: $death-color;
+    padding-left: 2px;
+    padding-right: 2px;
   }
 }
