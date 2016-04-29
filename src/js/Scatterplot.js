@@ -29,9 +29,9 @@ function Scatterplot(parentElem, factor, deaths, income, unemployment) {
     },
     'median_income': {
       data: income,
-      name: 'Median Income ($1000)',
+      name: 'Median Income (1000s)',
       shortName: 'Median Income',
-      format: formatDecimal,
+      format: formatCurrency,
       domain: [
         d3.min(income, function(d) { return d3.min(d.years, function(d) {return d.median_income; }); }),
         d3.max(income, function(d) { return d3.max(d.years, function(d) {return d.median_income; }); })
@@ -167,7 +167,8 @@ Scatterplot.prototype.initVis = function() {
           + formatYear(vis.deathRateYear) +')</span></span><br>'+
         '<span class="tip-header">'+ vis.data[vis.factor].shortName +
           ' <span class="tip-factor">('+ formatYear(vis.factorYear) +')</span></span><br>'+
-        '<span class="tip-header">Correlation: '+ formatDecimal(d.correlation.toFixed(2)) +'</span>';
+        '<span class="tip-header">Correlation: '+ d.correlation.toFixed(2) +'</span>'+
+        '<span class="more-info">Click for detailed information</span>';
     });
   vis.graph.call(vis.bflTip);
   

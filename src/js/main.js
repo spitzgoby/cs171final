@@ -4,7 +4,7 @@ var formatYear = d3.time.format('%Y');
 var parseYear = formatYear.parse;
 
 var formatPercent = d3.format('%');
-var formatDecimal = d3.format('.2');
+var formatCurrency = d3.format('$');
 var formatIdentity = function(str) { return str; };
 
 // universal color scale
