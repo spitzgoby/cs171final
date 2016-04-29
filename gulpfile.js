@@ -37,11 +37,13 @@ var paths = {
  *-----------*/
 // concats and minifies sass and css
 gulp.task('styles', ['clean-styles'], function() {
+  console.log(paths.src.css);
+  console.log(paths.dest.css);
   return sass(paths.src.css)
     .pipe(concat('style.min.css'))
-    .pipe(sourcemaps.init())
+    // .pipe(sourcemaps.init())
       .pipe(cleanCSS())
-    .pipe(sourcemaps.write('.'))
+    // .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(paths.dest.css));
 });
 
@@ -65,7 +67,7 @@ gulp.task('scripts', ['clean-scripts'], function() {
     .pipe(sourcemaps.init())
       .pipe(uglify())
     .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(paths.dest.js));
+    .pipe(gulp.dest(paths.dest.js))
 });
 
 /*-----------*
