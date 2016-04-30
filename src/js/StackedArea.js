@@ -39,7 +39,9 @@ function loadStackedArea(){
     var stack = d3.layout.stack()
         .values(function(d) { return d.values; });
 
-    var title = d3.select("#title")
+    var title = d3.select("#tree-title");
+    title.selectAll("*").remove();
+    title
         .append("h3")
         .text("Admission to Drug Treatment Programs by Subtance and Year");
     var svg = d3.select("#treemap-area");

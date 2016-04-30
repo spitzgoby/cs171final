@@ -20,8 +20,8 @@ function loadTreemap() {
         .sticky(true)
         .value(function(d) { return d.size[year_index]; });
 
-    var title = d3.select("#title");
-    title.select("*").remove();
+    var title = d3.select("#tree-title");
+    title.selectAll("*").remove();
     title
         .append("h3")
         .text("Proportional Admission to Drug Treatment Programs by Subtance and Year");

@@ -4,7 +4,7 @@ function changeToOther() {
     var svg = d3.select("#treemap-area");
     svg.selectAll("*").remove();
 
-    var title = d3.select("#title");
+    var title = d3.select("#tree-title");
     title.selectAll("*").remove();
 
     if(change){
