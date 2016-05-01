@@ -8,8 +8,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 </head>
 <body>
-<h1 align="center">Drugs, Death and the Economy</h1>
-  
+
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div id="navbar" class="collapse navbar-collapse">
@@ -20,8 +19,101 @@
       </div><!--/.nav-collapse -->
     </div>
   </nav>
+  <h1 align="center">Drugs, Death and the Economy</h1>
+  <hr>
+  <div class="fluid-container">
+    <div class="row row-centered">
+      <div class="col-sm-10 col-sm-offset-1">
 
-  <div class="fluid-container intro">
+        <h2 align="center">As the Economy Sinks, Drug use Rises</h2>
+        <p>
+          As median income falls, drug induced deaths rise. The same pattern appears with employment data, as the number
+          of unemployed people increases, the rate of drug-induced deaths also increased in lock step. Surprisingly
+          theses effects are concentrated among middle aged white males with little more than a high school education <a href="http://www.nber.org/papers/w22051" data-toggle="tooltip" title="http://www.nber.org/papers/w22051">(8)</a>.</p>
+      </div>
+    </div>
+    <div class="row row-centered">
+      <div class="visualizations col-sm-10 col-sm-offset-1">
+        <div class="col-sm-8">
+          <div id="choropleth"></div>
+        </div><!-- col-sm-8 -->
+        <div class="col-sm-4">
+          <div id="scatterplot"></div>
+          <div class="viz-controls">
+            <div class="btn-group-justified btn-group">
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-factor active"
+                        data-factor="median_income">
+                  Median Income
+                </button>
+              </div><!-- median_income button -->
+              <div class="btn-group">
+                <button type="button" class="btn btn-factor"
+                        data-factor="unemployment">
+                  Unemployment Rate
+                </button>
+              </div><!-- unemployment button -->
+            </div><!-- btn-group-justified -->
+            <div id="year-slider"><!-- Year Slider Goes Here --></div>
+            <!-- Explanatory text -->
+            <div id="slider-modal" class="modal fade" tabindex="-1" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><span class="death_rate">Death Rate</span> and <span class="factor">Factor</span> Year Slider</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p> It takes some time before economic factors begin to have
+                      an effect on death rates. A person may begin using drugs
+                      as the result of job loss and not pass away for several years.
+                      Conversely an upswing in median income would take several
+                      years to manifest in itself in lower death rates. The
+                      slider allows you to compare economic factors from one
+                      year against death rates from a different year.<br>
+                    <hr>
+                    <strong>Here are some interesting correlations that we found in
+                      the data:</strong></p>
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th>Death Rate</th>
+                        <th>Economic Factor</th>
+                        <th>Correlation</th>
+                        <th>Notes</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr>
+                        <td>2010</td>
+                        <td>Median Income (2008)</td>
+                        <td>-0.34</td>
+                        <td>After the economic recession in 2008</td>
+                      </tr>
+                      <tr>
+                        <td>2010-2014</td>
+                        <td>Unemployment Rate (2008)</td>
+                        <td>>0.2</td>
+                        <td>Correlation is stable from 2010 to 2014</td>
+                      </tr>
+                      </tbody>
+                      <tfoot></tfoot>
+                    </table>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-factor" data-dismiss="modal">Okay</button>
+                  </div>
+                </div><!-- modal-content -->
+              </div><!-- modal-dialog -->
+            </div><!-- modal -->
+
+          </div><!-- viz-controls -->
+        </div><!-- col-sm-4 -->
+      </div><!-- visualizations -->
+    </div><!-- row -->
+
+
+    <div class="fluid-container intro">
     <div class="row top-buffer">
       <div class="col-lg-2">
       </div>
@@ -74,124 +166,6 @@
       </div>
     </div>
   </div>
-
-  <div class="fluid-container economy">
-    <div class="row top-buffer">
-      <div class="col-lg-2">
-      </div>
-      <div class="col-lg-3 gauche">
-        <h2>Opioids</h2>
-        <p>
-          Opioids include any substance that acts on opioid receptors in the brain. Opium, an opioid in use since
-          antiquity is the forerunner of morphine and heroin. Morphine rose to prominence in the early 19th
-          century due to its miraculous ability to eliminate sever pain, the addictive qualities of Morphine did not go
-          unnoticed. In the second half of the 19th century, Bayer, a German pharmaceutical company discovered and
-          patented heroin, and declared it a safer less addictive alternative to morphine for the management of sever
-          pain. Pain management remains the most common medical use of opioids. In the modern era we have a greater
-          selection of opioids, including synthetic and semi-synthetics variants such codeine, hydrocodone, oxycodone
-          and fentanyl, but the dangers and challenges of addiction remain. <a href="https://www.drugabuse.gov/about-nida/legislative-activities/testimony-to-congress/2016/americas-addiction-to-opioids-heroin-prescription-drug-abuse" data-toggle="tooltip" title="https://www.drugabuse.gov/about-nida/legislative-activities/testimony-to-congress/2016/americas-addiction-to-opioids-heroin-prescription-drug-abuse">(7)</a></p>
-      </div>
-      <div class="col-lg-5 corps">
-        <img class="img-responsive img-center" src="img/oxyContin_setup.jpg" width="80%" height="80%">
-        <div class="photo_citation">Source: https://commons.wikimedia.org/wiki/File:OxyContin_setup.jpg</div>
-      </div>
-      <div class="col-lg-2">
-      </div>
-    </div>
-  </div>
-
-
-  <div class="fluid-container">
-    <div class="row row-centered">
-      <div class="col-sm-10 col-sm-offset-1">
-
-        <h2 align="center">As the Economy Sinks, Drug use Rises</h2>
-        <p>
-          As median income falls, drug induced deaths rise. The same pattern appears with employment data, as the number
-          of unemployed people increases, the rate of drug-induced deaths also increased in lock step. Surprisingly
-          theses effects are concentrated among middle aged white males with little more than a high school education <a href="http://www.nber.org/papers/w22051" data-toggle="tooltip" title="http://www.nber.org/papers/w22051">(8)</a>.</p>
-      </div>
-    </div>
-    <div class="row row-centered">
-      <div class="visualizations col-sm-10 col-sm-offset-1">
-        <div class="col-sm-8">
-          <div id="choropleth"></div>  
-        </div><!-- col-sm-8 -->
-        <div class="col-sm-4">
-          <div id="scatterplot"></div>
-          <div class="viz-controls">
-            <div class="btn-group-justified btn-group">
-              <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-factor active" 
-                  data-factor="median_income">
-                  Median Income
-                </button>
-              </div><!-- median_income button -->
-              <div class="btn-group">
-                <button type="button" class="btn btn-factor" 
-                  data-factor="unemployment">
-                  Unemployment Rate
-                </button>
-              </div><!-- unemployment button -->
-            </div><!-- btn-group-justified -->
-            <div id="year-slider"><!-- Year Slider Goes Here --></div>
-            <!-- Explanatory text -->
-            <div id="slider-modal" class="modal fade" tabindex="-1" role="dialog">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><span class="death_rate">Death Rate</span> and <span class="factor">Factor</span> Year Slider</h4>
-                  </div>
-                  <div class="modal-body">
-                    <p> It takes some time before economic factors begin to have 
-                      an effect on death rates. A person may begin using drugs 
-                      as the result of job loss and not pass away for several years.
-                      Conversely an upswing in median income would take several 
-                      years to manifest in itself in lower death rates. The 
-                      slider allows you to compare economic factors from one 
-                      year against death rates from a different year.<br>
-                      <hr>
-                      <strong>Here are some interesting correlations that we found in 
-                      the data:</strong></p>
-                      <table class="table table-striped">
-                        <thead>
-                          <tr>
-                            <th>Death Rate</th>
-                            <th>Economic Factor</th>
-                            <th>Correlation</th>
-                            <th>Notes</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>2010</td>
-                            <td>Median Income (2008)</td>
-                            <td>-0.34</td>
-                            <td>After the economic recession in 2008</td>
-                          </tr>
-                          <tr>
-                            <td>2010-2014</td>
-                            <td>Unemployment Rate (2008)</td>
-                            <td>>0.2</td>
-                            <td>Correlation is stable from 2010 to 2014</td>
-                          </tr>
-                        </tbody>
-                        <tfoot></tfoot>
-                      </table>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-factor" data-dismiss="modal">Okay</button>
-                  </div>
-                </div><!-- modal-content -->
-              </div><!-- modal-dialog -->
-            </div><!-- modal -->
-            
-          </div><!-- viz-controls -->
-        </div><!-- col-sm-4 -->
-      </div><!-- visualizations -->    
-    </div><!-- row -->
-
 
 
     <div class="row row-centered">
