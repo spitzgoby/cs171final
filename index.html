@@ -214,10 +214,10 @@
 
 
       <div class="col-sm-offset-1 col-sm-10">
-          <div id="tree-title" align="center"></div>
+          <div id="tree-title" align="center"><h3 id="tree-title"></h3></div>
           <div id="treemap-area" align="center"></div>
           <div class="viz-controls" align="center">
-            <button type="button" value="clickme" class="btn btn-factor" onclick="changeToOther();">Switch View</button>
+            <button type="button" value="clickme" class="btn btn-factor" onclick="">Switch View</button>
           </div>
       </div>
     </div>
@@ -270,7 +270,6 @@
         $(this).addClass('active');
         updateFactor($(this).data('factor'));
       });
-      loadTreemap();
     });
 
     $(document).ready(function(){

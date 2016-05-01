@@ -18,15 +18,17 @@ var colors = d3.scale.quantile()
   
 // load all data before cleaning
 var dataLoaded = false;
+var dataDir = 'data/';
 d3_queue.queue()
-  .defer(d3.json, 'data/topo_usa.json')
-  .defer(d3.json, 'data/state_deaths.json')
-  .defer(d3.json, 'data/state_income.json')
-  .defer(d3.json, 'data/state_unemployment.json')
+  .defer(d3.json, dataDir+'topo_usa.json')
+  .defer(d3.json, dataDir+'state_deaths.json')
+  .defer(d3.json, dataDir+'state_income.json')
+  .defer(d3.json, dataDir+'state_unemployment.json')
+  .defer(d3.json, dataDir+'drug_use.json')
   .await(loadData);
   
 // globals for data
-function loadData(error, topo, deaths, income, unemployment) {
+function loadData(error, topo, deaths, income, unemployment, drugUse) {
   if (error) {
     console.log(error);
   } else {
@@ -62,7 +64,7 @@ function loadData(error, topo, deaths, income, unemployment) {
     // update data loading status
     dataLoaded = true;
     // create visualizations
-    createVis(topo, deaths, income, unemployment);
+    createVis(topo, deaths, income, unemployment, drugUse);
   }
 }
 
@@ -74,7 +76,7 @@ var handler = new EventHandler();
 d3.select(window).on('resize', function() {handler.broadcast({name: 'resize'})});
 
 // creates and initializes all visualizations 
-function createVis(topo, deaths, income, unemployment) {
+function createVis(topo, deaths, income, unemployment, drugUse) {
   
   choropleth = new Choropleth('choropleth', topo, deaths);
   choropleth.eventHandler(handler).initVis();
@@ -85,6 +87,10 @@ function createVis(topo, deaths, income, unemployment) {
   yearSlider = new YearSlider('year-slider', [2002, 2014]);
   yearSlider.eventHandler(handler).initVis();
   handler.on('question-clicked', this, displaySliderDescription);
+  
+  console.log(drugUse);
+  treemap = new Treemap('treemap-area', drugUse);
+  treemap.eventHandler(handler).initVis();
 }
 
 // update visualizations based on selected options

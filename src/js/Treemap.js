@@ -1,225 +1,135 @@
 
-function loadTreemap() {
-
-    //used to get data for the correct year for a node
-    var year_index = 0
-
-    var margin = {top: 25, right: 100, bottom: 30, left: 100};
-
-    var width = parseInt(d3.select('#treemap-area').style('width')) - margin.left - margin.right,
-        height = width * .66 - margin.top - margin.bottom,
-        x = d3.scale.linear().range([0, width]),
-        y = d3.scale.linear().range([0, height]),
-        color = d3.scale.category20(),
-        root,
-        node;
-
-    var treemap = d3.layout.treemap()
-        .round(false)
-        .size([width, height])
-        .sticky(true)
-        .value(function(d) { return d.size[year_index]; });
-
-    var title = d3.select("#tree-title");
-    title.selectAll("*").remove();
-    title
-        .append("h3")
-        .text("Proportional Admission to Drug Treatment Programs by Subtance and Year");
-
-
-    var svg = d3.select("#treemap-area");
-    svg.select("*").remove();
-
-    var brushedSlider = d3.select("#treemap-area")
-        .append("svg")
-        .attr("class", "slider")
-        .attr("width", width)
-        .attr("height", height/9)
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var legend = d3.select("#treemap-area")
-        .append("svg")
-        .attr("class", "legend")
-        .attr("width", width * 0.9)
-        .attr("height", height/9)
-        .attr("transform", "translate(" + margin.left + "," + 0 + ")");
-
-    svg = d3.select("#treemap-area")
-        .append("svg")
-        .attr("class", "chart")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    d3.json("data/betterTreeMapData.json", function(data) {
-        node = root = data;
-
-        var nodes = treemap.nodes(root)
-            .filter(function(d) { return !d.children; });
-        var cell = svg.selectAll("g")
-            .data(nodes)
-            .enter().append("svg:g")
-            .attr("class", "cell")
-            .attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
-            .on("click", function(d) { return zoom(node == d.parent ? root : d.parent); });
-
-        cell.append("svg:rect")
-            .attr("width", function(d) { return d.dx - 1; })
-            .attr("height", function(d) { return d.dy - 1; })
-            .style("fill", function(d) { return color(d.parent.name); });
-
-        cell.append("svg:text")
-            .attr("x", function(d) { return d.dx / 2; })
-            .attr("y", function(d) { return d.dy / 2; })
-            .attr("dy", ".35em")
-            .attr("text-anchor", "middle")
-            .text(function(d) { return d.name; })
-            .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
-
-        d3.select(window).on("click", function() { zoom(root); });
-
-        function getNames(items){
-            a = [];
-            for (var i = 0; i < items.length; i++) {
-                a[i] = items[i].name
-            }
-            return a;
-        }
-
-        var legendElements = legend.selectAll("g")
-            .data(getNames(node.children))
-            .enter().append("svg:g")
-            .attr("class", "legend")
-            .attr("transform", "translate(" + margin.left + "," + 0 + ")");
-
-        legendElements.append("svg:rect")
-            .attr("x", function(d,i) {
-                return i * (width*0.8)/(getNames(node.children).length) +25; })
-            .attr("y", 10)
-            .attr("width", 10 )
-            .attr("height", 10 )
-            .style("fill", function(d) { return color(d); });
-
-        legendElements.append("svg:text")
-            .attr("x", function(d,i) {
-                return i * (width*0.8)/(getNames(node.children).length) +30; })
-            .attr("y", 30)
-            .attr("dy", ".35em")
-            .attr("text-anchor", "middle")
-            .text(function(d) { return d.replace('_', ' '); });
-
-
-        //x scale for the slider
-        var sliderX = d3.scale.linear()
-            .domain([2003, 2013])
-            .range([0, width-margin.left-margin.right])
-            .clamp(true);
-
-        var brush = d3.svg.brush()
-            .x(sliderX)
-            .extent([0, 0])
-            .on("brush", brushed);
-
-        //adding the slider to the page
-        brushedSlider.append("rect")
-            .attr("class", "slider_background")
-            .attr("height", 4)
-            .attr("width", width-margin.left-margin.right)
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        ;
-
-        brushedSlider.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .call(d3.svg.axis()
-                .scale(sliderX)
-                .orient("bottom")
-                .tickFormat(function (d) {
-                    return +d;
-                })
-                .tickSize(0)
-                .tickPadding(12))
-            .select(".domain")
-            .select(function () {
-                return this.parentNode.appendChild(this.cloneNode(true));
-            })
-            .attr("class", "halo");
-
-        var slider = brushedSlider.append("g")
-            .attr("class", "slider")
-            .call(brush);
-
-
-        slider.select(".background")
-            .attr("height", 100);
-
-        var handle = slider.append("circle")
-            .attr("class", "handle")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .attr("r", 9);
-
-        slider
-            .call(brush.event)
-            .transition() // gratuitous intro!
-            .duration(750)
-            .call(brush.extent([2013, 2013]))
-            .call(brush.event);
-        function brushed() {
-            var initialValue = value = Math.round(brush.extent()[0]);
-            if (d3.event.sourceEvent) { // not a programmatic event
-                value = Math.round(sliderX.invert(d3.mouse(this)[0]-margin.left));
-                console.log(value);
-                brush.extent([value, value]);
-            }
-
-            if ((value > 2002) && (value < 2014)) {
-                year_index = value - 2003
-                var year = function (d) {
-                    return d.size[year_index];
-                };
-                treemap.value(year).nodes(root);
-                zoom(node);
-            }
-            handle.attr("cx", sliderX(value));
-        }
-
-        //If an area is clicked, zoom in on that area
-        //if the year is changed transition to the data for the new year
-        function zoom(d) {
-
-            var kx = (width) / d.dx, ky = (height) / d.dy;
-            x.domain([d.x, d.x + d.dx]);
-            y.domain([d.y, d.y + d.dy]);
-
-            var t = svg.selectAll("g.cell").transition()
-                .duration(d3.event.altKey ? 7500 : 750)
-                .attr("transform", function (d) {
-                    return "translate(" + x(d.x ) + "," + y(d.y ) + ")";
-                });
-
-            t.select("rect")
-                .attr("width", function (d) {
-                    return kx * d.dx - 1;
-                })
-                .attr("height", function (d) {
-                    return ky * d.dy - 1;
-                })
-
-            t.select("text")
-                .attr("x", function (d) {
-                    return kx * d.dx / 2;
-                })
-                .attr("y", function (d) {
-                    return ky * d.dy / 2;
-                })
-                .style("opacity", function (d) {
-                    return kx * d.dx > d.w ? 1 : 0;
-                });
-
-            node = d;
-            //no need to stop propogation on brush events
-            if(d3.event.type != "brush"){d3.event.stopPropagation();}
-        }
-    });
+function Treemap(parentElem, data) {
+  this.parentElem = parentElem;
+  this.treeData = data;
+  this.year_index = 0;
 }
 
+Treemap.prototype.eventHandler = function(eventHandler) {
+  if (eventHandler) {
+    this._eventHandler = eventHandler;
+    this._eventHandler.on('switchView', this, this.switchView);
+    this._eventHandler.on('resize', this, this.handleResize);
+    this._eventHandler.on('updateDrugs', this, this.handleUpdate);
+    
+    return this;
+  }
+  
+  return this._eventHandler;
+}
+
+Treemap.prototype.switchView = function(event) {
+  
+}
+
+Treemap.prototype.handleResize = function(event) {
+  console.log('resizing');
+  this.resize();
+}
+
+Treemap.prototype.handleUpdate = function(event) {
+  
+}
+
+Treemap.prototype.initVis = function() {
+  var vis = this;
+  
+  vis.svg = d3.select('#'+vis.parentElem).append('svg');
+  vis.graph = vis.svg.append('g').classed('chart', true);
+  
+  vis.x = d3.scale.linear();
+  vis.y = d3.scale.linear();
+  vis.color = d3.scale.category20();
+  
+  vis.treemap = d3.layout.treemap()
+    .round(false)
+    .sticky(true)
+    .value(function(d) { return d.size[vis.year_index]; });
+    
+  vis.resize();
+}
+
+Treemap.prototype.resize = function() {
+  var vis = this;
+    
+  vis.margin = {top: 25, right: 100, bottom: 30, left: 100};
+  vis.width = parseInt(d3.select('#'+vis.parentElem).style('width')) - vis.margin.left - vis.margin.right,
+  vis.height = vis.width * .66 - vis.margin.top - vis.margin.bottom,
+  
+  vis.svg
+    .attr('width', vis.width + vis.margin.left + vis.margin.right)
+    .attr('height', vis.height + vis.margin.top + vis.margin.bottom);
+  
+  vis.graph
+    .attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
+    
+  vis.treemap.size([vis.width, vis.height]);
+  vis.x.range([0, vis.width]);
+  vis.y.range([0, vis.height]);
+  
+  vis.update();
+}
+
+Treemap.prototype.wrangleData = function(options) {
+  vis.displayData = vis.treeData;
+}
+
+Treemap.prototype.update = function(options) {
+  var vis = this;
+        
+  var node = vis.treeData;
+  var root = vis.treeData;
+
+  var nodes = vis.treemap.nodes(root)
+      .filter(function(d) { return !d.children; });
+      
+  var cells = vis.graph.selectAll(".cell").data(nodes);
+  var cellGroups = cells.enter().append("g").attr("class", "cell")
+      .attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
+      .on("click", function(d) { return vis.zoom(node == d.parent ? root : d.parent); });
+  cellGroups.append("rect")
+    .style("fill", function(d) { return vis.color(d.parent.name); });
+        
+  cellGroups.append("text")
+    .attr("dy", ".35em")
+    .attr("text-anchor", "middle")
+    .text(function(d) { return d.name; })
+          
+  cellGroups.selectAll('rect')
+    .attr("width", function(d) { return d.dx - 1; })
+    .attr("height", function(d) { return d.dy - 1; })
+  cellGroups.selectAll('text')
+    .attr("x", function(d) { return d.dx / 2; })
+    .attr("y", function(d) { return d.dy / 2; })
+    .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; })
+
+  d3.select(window).on("click", function() { vis.zoom(root); });
+}
+
+Treemap.prototype.zoom = function(d) {
+  var vis = this;
+
+  var kx = (vis.width) / d.dx, ky = (vis.height) / d.dy;
+  vis.year_index = 0
+  vis.x.domain([d.x, d.x + d.dx]);
+  vis.y.domain([d.y, d.y + d.dy]);
+
+  var t = vis.graph.selectAll(".cell").transition()
+      .duration(d3.event.altKey ? 7500 : 750)
+      .attr("transform", function (d) {
+          return "translate(" + vis.x(d.x ) + "," + vis.y(d.y ) + ")";
+      });
+
+  t.select("rect")
+      .attr("width", function (d) { return kx * d.dx - 1; })
+      .attr("height", function (d) { return ky * d.dy - 1; })
+
+  t.select("text")
+      .attr("x", function (d) { return kx * d.dx / 2; })
+      .attr("y", function (d) { return ky * d.dy / 2; })
+      .style("opacity", function (d) { return kx * d.dx > d.w ? 1 : 0; });
+
+  node = d;
+  //no need to stop propogation on brush events
+  if(d3.event.type != "brush"){d3.event.stopPropagation();}
+}
