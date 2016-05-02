@@ -101,11 +101,11 @@ function createVis(topo, deaths, income, unemployment, drugUse, treatment) {
   yearSlider.eventHandler(handler).initVis();
   handler.on('question-clicked', this, displaySliderDescription);
   
-  treemap = new Treemap('dual-view-area', 'shared-chart', drugUse);
-  treemap.eventHandler(handler).initVis();
-  
   stackedAreaChart = new StackedAreaChart('dual-view-area', 'shared-chart', treatment);
   stackedAreaChart.eventHandler(handler).initVis();
+  
+  treemap = new Treemap('dual-view-area', 'shared-chart', drugUse);
+  treemap.eventHandler(handler).initVis();
   
   singleYearSlider = new SingleYearSlider('single-year-slider', [2003, 2013]);
   singleYearSlider.eventHandler(handler).initVis();

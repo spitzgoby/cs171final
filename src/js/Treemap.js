@@ -18,6 +18,7 @@ function Treemap(parentElem, chartElem, data) {
   this.chartElem = chartElem;
   this.treeData = data;
   this.year_index = data.years[1]-data.years[0];
+  this.visible = true;
 }
 
 /**
@@ -142,7 +143,7 @@ Treemap.prototype.update = function(options) {
   
   // Enter
   var cellsEnter = cells.enter().append("g").attr("class", "cell")
-      .on("click", function(d) { return vis.zoom(node == d.parent ? root : d.parent); });
+      .on("click", function(d) { console.log('clicked'); return vis.zoom(node == d.parent ? root : d.parent); });
   cellsEnter.append("rect")
     .style("fill", function(d) { return drugColors(d.parent.name); });
   cellsEnter.append("text")
@@ -201,10 +202,16 @@ Treemap.prototype.zoom = function(d) {
  * @return Treemap
  */
 Treemap.prototype.switchView = function(event) {
+  console.log('swtiching view')
   var vis = this;
-  var opacity = (vis.graph.attr('opacity') == 1) ? 0 : 1;
+  // update visibility
+  vis.visible = !vis.visible;
+  var offset = vis.visible? vis.margin.left : -3000;
+  // transition to new layout
   vis.graph.transition().duration(1000)
-    .attr('opacity', opacity);
+    .attr('transform', 'translate('+ offset +','+ vis.margin.top +')');
+    
+  return vis;
 }
 
 /**

@@ -16,6 +16,7 @@ function StackedAreaChart(parentElem, chartElem, data) {
   this.parentElem = parentElem;
   this.chartElem = chartElem;
   this.data = data;
+  this.visible = false;
 }
 
 /**
@@ -55,8 +56,7 @@ StackedAreaChart.prototype.initVis = function() {
     vis.svg = d3.select('#'+vis.parentElem).append('svg');
   }
   vis.graph = vis.svg.append('g')
-    .classed('graph', true)
-    .attr('opacity', 0); // stacked area chart starts invisible
+    .classed('graph', true);
   
   /*** CHART DATA ELEMENTS ***/
   vis.x = d3.time.scale();
@@ -126,7 +126,7 @@ StackedAreaChart.prototype.resize = function() {
     .attr('height', vis.height + vis.margin.top + vis.margin.bottom);
   
   vis.graph
-    .attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
+    .attr('transform', 'translate(3000,'+ vis.margin.top +')'); // starts offscreen
   
   /*** UPDATE SCALES AND AXES ***/
   vis.x.range([0, vis.width]);
@@ -213,10 +213,7 @@ StackedAreaChart.prototype.update = function(options) {
  */
 StackedAreaChart.prototype.highlightSubstance = function(d) {
   var vis = this;
-  if (vis.graph.attr('opacity') == 1) {
-    vis.tip.show(d);
-  }
-  
+  vis.tip.show(d);
   return vis;
 }
 
@@ -261,15 +258,18 @@ StackedAreaChart.prototype.handleResize = function(event) {
 }
 
 /**
- * Switch the opacity of the visualization
+ * Switch the visibility of the visualization
  *
  * @return StackedAreaChart
  */
 StackedAreaChart.prototype.switchView = function(event) {
   var vis = this;
-  var opacity = (vis.graph.attr('opacity') == 1) ? 0 : 1 ;
+  // update visibility
+  vis.visible = !vis.visible;
+  var offset = vis.visible? vis.margin.left : 3000;
+  // transition to new layout
   vis.graph.transition().duration(1000)
-    .attr('opacity', opacity);
+    .attr('transform', 'translate('+ offset +','+ vis.margin.top +')');
     
   return vis;
 }

@@ -27,7 +27,7 @@ function SingleYearSlider(parentElem, years) {
 SingleYearSlider.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
-    this._eventhandler.on('resize', this, this.handleResize);
+    this._eventHandler.on('resize', this, this.handleResize);
     
     return this;
   }
