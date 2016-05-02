@@ -71,7 +71,16 @@ Treemap.prototype.initVis = function() {
     .round(false)
     .sticky(true)
     .value(function(d) { return d.size[vis.year_index]; });
-    
+
+    /*** treemap TIP ***/
+  vis.tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .html(function(d) {
+        console.log(d);
+        return "Substance Type: "+ d.name + "<br> Number of People Seeking Treatment : " + d.size[vis.year_index];
+    });
+  vis.graph.call(vis.tip);
+
   vis.resize();
 }
 
@@ -102,7 +111,8 @@ Treemap.prototype.resize = function() {
   vis.treemap.size([vis.width, vis.height]);
   vis.x.range([0, vis.width]);
   vis.y.range([0, vis.height]);
-  
+
+
   vis.update();
 }
 
@@ -146,7 +156,9 @@ Treemap.prototype.update = function(options) {
   var cellsEnter = cells.enter().append("g").attr("class", "cell")
       .on("click", function(d) { return vis.zoom(vis.node === d.parent ? root : d.parent); });
   cellsEnter.append("rect")
-    .style("fill", function(d) { return drugColors(d.parent.name); });
+    .style("fill", function(d) { return drugColors(d.parent.name); })
+      .on('mouseover', function(d) { vis.highlightSubstance(d) })
+      .on('mouseout', function(d) { vis.unhighlightSubstance(d) });
   cellsEnter.append("text")
     .attr("dy", ".35em")
     .attr("text-anchor", "middle")
@@ -156,8 +168,9 @@ Treemap.prototype.update = function(options) {
     .attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
   cells.selectAll('rect').transition().duration(1000)
     .attr("width", function(d) { return d.dx - 1; })
-    .attr("height", function(d) { return d.dy - 1; })
-  cells.selectAll('text').transition().duration(1000)
+    .attr("height", function(d) { return d.dy - 1; });
+
+    cells.selectAll('text').transition().duration(1000)
     .attr("x", function(d) { return d.dx / 2; })
     .attr("y", function(d) { return d.dy / 2; })
     .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; })
@@ -192,6 +205,31 @@ Treemap.prototype.zoom = function(d) {
   if(d3.event.type != "brush"){d3.event.stopPropagation();}
   
   vis.zoomed = !vis.zoomed;
+}
+
+/**
+ * Displays a d3 tip for the given substance
+ *
+ * @param d The substance data element that was highlighted
+ * @return StackedAreaChart
+ */
+Treemap.prototype.highlightSubstance = function(d) {
+    var vis = this;
+    vis.tip.show(d);
+    return vis;
+}
+
+/**
+ * Removes a d3 tip from the given substance
+ *
+ * @param d The substance data element that was unhighlighted
+ * @return StackedAreaChart
+ */
+Treemap.prototype.unhighlightSubstance = function(d) {
+    var vis = this;
+    vis.tip.hide(d);
+
+    return vis;
 }
 
 
