@@ -339,7 +339,7 @@ Scatterplot.prototype.update = function(options) {
   vis.dots.transition().duration(duration)
     .attr('cx', function(d) { return vis.x(d.factor); })
     .attr('cy', function(d) { return vis.y(d.death_rate); })
-    .attr('fill', function(d) { return colors(d.death_rate)});
+    .attr('fill', function(d) { return stateColors(d.death_rate)});
       
   // get variables to pass to regression calculator
   var xSeries = vis.displayData.map(function(d) { return d.factor; });
