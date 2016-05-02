@@ -68,7 +68,9 @@
     
     <div class="row">
       <div id="drug-type-legend"></div>
-      <div id="treemap-area"></div>
+      <div id="dual-view-area">
+        <svg id="shared-chart"></svg>
+      </div>
       <div class="viz-controls" align="center">
         <div id="single-year-slider"></div>
         <button type="button" id="switch-view-button" class="btn btn-factor">Switch View</button>
@@ -91,6 +93,7 @@
   <script src="src/js/Treemap.js"></script>
   <script src="src/js/SingleYearSlider.js"></script>
   <script src="src/js/DrugTypeLegend.js"></script>
+  <script src="src/js/StackedArea.js"></script>
   <script src="src/js/main.js"></script>
   <script>
     $(document).ready(function(){

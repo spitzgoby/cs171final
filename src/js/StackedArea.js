@@ -1,156 +1,168 @@
 
-function loadStackedArea(){
+function StackedAreaChart(parentElem, chartElem, data) {
+  this.parentElem = parentElem;
+  this.chartElem = chartElem;
+  this.data = data;
+}
 
-    var margin = {top: 10, right: 100, bottom: 30, left: 100},
-        width = parseInt(d3.select('#treemap-area').style('width')) - margin.left - margin.right,
-        height = width * .55 - margin.top - margin.bottom;
+StackedAreaChart.prototype.eventHandler = function(eventHandler) {
+  if (eventHandler) {
+    this._eventHandler = eventHandler;
+    this._eventHandler.on('resize', this, this.handleResize);
+    this._eventHandler.on('switchView', this, this.switchView);
+    
+    return this;
+  }
+  
+  return this._eventHandler;
+}
 
-    var parseDate = d3.time.format("%Y").parse,
-        formatPercent = d3.format(".0%");
+StackedAreaChart.prototype.handleResize = function(event) {
+  this.resize();
+}
 
-    var x = d3.time.scale()
-        .range([0, width]);
+StackedAreaChart.prototype.switchView = function(event) {
+  var vis = this;
+  var opacity = vis.graph.attr('opacity');
+  opacity = (opacity == 1) ? 0 : 1;
+  console.log(opacity);
+  vis.graph.transition().duration(1000)
+    .attr('opacity', opacity);
+}
 
-    var y = d3.scale.linear()
-        .range([height, 0]);
-
-    var axisYScale = d3.scale.linear()
-        .domain([0, 2100000])
-        .range([height, 0]);
-
-
-    var color = d3.scale.category20();
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
-    var yAxis = d3.svg.axis()
-        .orient("left")
-        .scale(axisYScale)
-        .tickFormat(d3.format(",.0f"));
-
-
-    var area = d3.svg.area()
-        .x(function(d) { return x(d.date); })
-        .y0(function(d) { return y(d.y0); })
-        .y1(function(d) { return y(d.y0 + d.y); });
-
-    var stack = d3.layout.stack()
-        .values(function(d) { return d.values; });
-
-    var title = d3.select("#tree-title");
-    title.selectAll("*").remove();
-    title
-        .append("h3")
-        .text("Admission to Drug Treatment Programs by Subtance and Year");
-    var svg = d3.select("#treemap-area");
-    svg.selectAll("*").remove();
-
-    var legend = d3.select("#treemap-area")
-        .append("svg")
-        .attr("class", "legend")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height/9)
-        .attr("transform", "translate(" + margin.left + "," + 0 + ")");
-
-
-    var svg = d3.select("#treemap-area")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    d3.tsv("data/treatment2003_2013.tsv", function(error, data) {
-        if (error) throw error;
-
-        color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
-
-        data.forEach(function(d) {
-            d.date = parseDate(d.date);
-        });
-
-        var substances = stack(color.domain().map(function(name) {
-            return {
-                name: name,
-                values: data.map(function(d) {
-                    return {date: d.date, y: d[name]/2100000
-                }
-                })
-            };
-        }));
-
-        x.domain(d3.extent(data, function(d) { return d.date; }));
-
-        var legendElements = legend.selectAll("g")
-            .data(substances)
-            .enter().append("svg:g")
-            .attr("class", "legend")
-            .attr("transform", "translate(" + margin.left + "," + 0 + ")");
-
-        legendElements.append("svg:rect")
-            .attr("x", function(d,i) {
-                return i * (width*0.9)/(substances.length) +25; })
-            .attr("y", 10)
-            .attr("width", 10 )
-            .attr("height", 10 )
-            .style("fill", function(d) { return color(d.name); });
-
-        legendElements.append("svg:text")
-            .attr("x", function(d,i) {
-                return i * (width*0.9)/(substances.length) +30; })
-            .attr("y", 30)
-            .attr("dy", ".35em")
-            .attr("text-anchor", "middle")
-            .text(function(d) { return d.name; });
-
-        var substance = svg.selectAll(".browser")
-            .data(substances)
-            .enter().append("g")
-            .attr("class", "browser");
-
-        substance.append("path")
-            .attr("class", "area")
-            .attr("d", function(d) { return area(d.values); })
-            .style("fill", function(d) { return color(d.name); })
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide);
-
-        substance.call(tip);
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
+StackedAreaChart.prototype.initVis = function() {
+  var vis = this;
+    
+  vis.svg = d3.select('#'+vis.parentElem).selectAll('svg#'+vis.chartElem);
+  if (vis.svg.empty()) {
+    vis.svg = d3.select('#'+vis.parentElem).append('svg');
+  }
+  vis.graph = vis.svg.append('g')
+    .classed('graph', true)
+    .attr('opacity', 0); // stacked area chart starts invisible
+  
+  vis.x = d3.time.scale();
+  vis.y = d3.scale.linear();
+  
+  vis.xAxis = d3.svg.axis()
+    .scale(vis.x)
+    .orient("bottom");
+  vis.yAxis = d3.svg.axis()
+    .orient("left")
+    .scale(vis.y)
+    .tickFormat(d3.format(",.0f"));
+    
+  vis.xAxisG = vis.graph.append("g")
+    .attr("class", "x axis");
+  vis.yAxisG = vis.graph.append("g")
+    .attr("class", "y axis")
+      
+  vis.area = d3.svg.area()
+    .x(function(d) { return vis.x(d.date); })
+    .y0(function(d) { return vis.y(d.y0); })
+    .y1(function(d) { return vis.y(d.y0 + d.y); });
+  vis.stack = d3.layout.stack()
+    .values(function(d) { return d.values; });
+      
+  vis.tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .html(function(d) {
+      return ""+
+        "<table>"+ 
+          "<th>Substance Type: "+ d.name +"</th>"+ 
+          vis.makeSubstanceTable(d.values)+ 
+        "</table>";
     });
+  vis.graph.call(vis.tip);
+  
+  vis.resize();
+}
 
-    var tip = d3.tip().attr('class', 'd3-tip').html(function(d) {
+StackedAreaChart.prototype.resize = function() {
+  var vis = this;
+  vis.margin = {top: 10, right: 100, bottom: 30, left: 100},
+  vis.width = parseInt(d3.select('#'+vis.parentElem).style('width')) - vis.margin.left - vis.margin.right,
+  vis.height = vis.width * .66 - vis.margin.top - vis.margin.bottom;
+  
+  vis.svg
+    .attr('width', vis.width + vis.margin.left + vis.margin.right)
+    .attr('height', vis.height + vis.margin.top + vis.margin.bottom);
+  
+  vis.graph
+    .attr('transform', 'translate('+ vis.margin.left +','+ vis.margin.top +')');
+  
+  vis.x.range([0, vis.width]);
+  vis.y.range([vis.height, 0]);
+  
+  vis.xAxisG.attr("transform", "translate(0," + vis.height + ")");
+  
+  vis.update();
+}
 
-        var name = d.name.replace('_', ' ');
-        var number = d.values;
+StackedAreaChart.prototype.wrangleData = function(options) {
+  var vis = this;
+  
+  vis.displayData = vis.stack(Object.keys(vis.data[0]).filter(function(k) { return k !== 'date';})
+    .map(function(substance) {
+      return {
+        name: substance,
+        values: vis.data.map(function(d) { return { date: d.date, y: d[substance]}; }) 
+      };
+    }));
+  console.log(vis.displayData);
+}
 
-        function makeTable(data){
-            table = "<tr><td>Year</td><td>Admissions to Treatment</td>";
+StackedAreaChart.prototype.update = function(options) {
+  var vis = this;
+  
+  vis.wrangleData(options);
+  
+  vis.x.domain(d3.extent(vis.data, function(d) { return d.date; }));
+  vis.y.domain([0, 2100000]);
+  
+  vis.stack(vis.displayData);
+  
+  var substances = vis.graph.selectAll(".substance").data(vis.displayData);
+  
+  var substancesEnter = substances.enter().append("g")
+    .attr("class", "substance");
 
-            for(var i=0;i<number.length;i++){
-                table += "<tr>"+
-                        "<td>" + data[i].date.getFullYear() + "</td>" +
-                        "<td>" + (parseInt(data[i].y*2100000)) + "</td>" +
-                    "</tr>";
-            }
-            return table;
-        }
+  substancesEnter.append("path")
+    .attr("class", "area");
+  substances.selectAll('path.area')
+    .attr("d", function(d) { return vis.area(d.values); })
+    .attr("fill", function(d) { return drugColors(d.name); })
+    .attr('stroke-width', 2)
+    .on('mouseover', function(d) { vis.highlightSubstance(d) })
+    .on('mouseout', function(d) { vis.unhighlightSubstance(d) });
 
-        var table = "<table>" + "<th>Substance Type : "+ name +"</th>" + makeTable(number)+ "</table>";
-        return table;
+  vis.xAxisG.call(vis.xAxis);
+  vis.yAxisG.call(vis.yAxis);
+}
 
-    });
+StackedAreaChart.prototype.highlightSubstance = function(d) {
+  var vis = this;
+  if (vis.graph.attr('opacity') == 1) {
+    vis.tip.show(d);
+  }
+  
+  return vis;
+}
 
+StackedAreaChart.prototype.unhighlightSubstance = function(d) {
+  var vis = this;
+  vis.tip.hide(d);
+  
+  return vis;
+}
 
+StackedAreaChart.prototype.makeSubstanceTable = function(data){
+  table = "<tr><td>Year</td><td>Admissions to Treatment</td>";
+  for(var i=0;i<data.length;i++){
+      table += "<tr>"+
+              "<td>" + data[i].date.getFullYear() + "</td>" +
+              "<td>" + (parseInt(data[i].y*2100000)) + "</td>" +
+          "</tr>";
+  }
+  return table;
 }

@@ -26,10 +26,11 @@ d3_queue.queue()
   .defer(d3.json, dataDir+'state_income.json')
   .defer(d3.json, dataDir+'state_unemployment.json')
   .defer(d3.json, dataDir+'drug_use.json')
+  .defer(d3.tsv, dataDir+'treatment2003_2013.tsv')
   .await(loadData);
   
 // globals for data
-function loadData(error, topo, deaths, income, unemployment, drugUse) {
+function loadData(error, topo, deaths, income, unemployment, drugUse, treatment) {
   if (error) {
     console.log(error);
   } else {
@@ -61,11 +62,21 @@ function loadData(error, topo, deaths, income, unemployment, drugUse) {
         year.unemployment = +year.unemployment;
         year.year = parseYear(year.year);
       })
-    })
+    });
+    
+    
+    treatment.forEach(function(year) {
+      var total = 0;
+      d3.keys(year).forEach(function(k) {
+        if (k === 'date') { year.date = parseYear(year.date); } 
+        else { year[k] = +year[k]; }
+      });
+    });
+    
     // update data loading status
     dataLoaded = true;
     // create visualizations
-    createVis(topo, deaths, income, unemployment, drugUse);
+    createVis(topo, deaths, income, unemployment, drugUse, treatment);
   }
 }
 
@@ -78,7 +89,7 @@ d3.select(window).on('resize', function() {handler.broadcast({name: 'resize'});}
 d3.select('#switch-view-button').on('click', function() {handler.broadcast({name: 'switchView'});});
 
 // creates and initializes all visualizations 
-function createVis(topo, deaths, income, unemployment, drugUse) {
+function createVis(topo, deaths, income, unemployment, drugUse, treatment) {
   
   choropleth = new Choropleth('choropleth', topo, deaths);
   choropleth.eventHandler(handler).initVis();
@@ -90,8 +101,11 @@ function createVis(topo, deaths, income, unemployment, drugUse) {
   yearSlider.eventHandler(handler).initVis();
   handler.on('question-clicked', this, displaySliderDescription);
   
-  treemap = new Treemap('treemap-area', drugUse);
+  treemap = new Treemap('dual-view-area', 'shared-chart', drugUse);
   treemap.eventHandler(handler).initVis();
+  
+  stackedAreaChart = new StackedAreaChart('dual-view-area', 'shared-chart', treatment);
+  stackedAreaChart.eventHandler(handler).initVis();
   
   singleYearSlider = new SingleYearSlider('single-year-slider', [2003, 2013]);
   singleYearSlider.eventHandler(handler).initVis();

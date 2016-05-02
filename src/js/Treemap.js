@@ -1,6 +1,7 @@
 
-function Treemap(parentElem, data) {
+function Treemap(parentElem, chartElem, data) {
   this.parentElem = parentElem;
+  this.chartElem = chartElem;
   this.treeData = data;
   this.year_index = data.years[1]-data.years[0];
 }
@@ -43,7 +44,11 @@ Treemap.prototype.handleUpdate = function(event) {
 Treemap.prototype.initVis = function() {
   var vis = this;
   
-  vis.svg = d3.select('#'+vis.parentElem).append('svg');
+  vis.svg = d3.select('#'+vis.parentElem).selectAll('svg#'+vis.chartElem);
+  if (vis.svg.empty()) {
+    vis.svg = d3.select('#'+vis.parentElem).append('svg');
+  }
+  
   vis.graph = vis.svg.append('g')
     .classed('chart', true)
     .attr('opacity', 1);
