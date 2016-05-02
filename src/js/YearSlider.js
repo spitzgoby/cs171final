@@ -91,6 +91,10 @@ YearSlider.prototype.initVis = function() {
       .attr('transform', 'rotate(90)')
   
   /*** DRAG BEHAVIOR ***/
+  vis.dragDualSlider = d3.behavior.drag()
+    .on('dragstart', function(d) { vis.dualSliderStartedDragging(d); })
+    .on('drag', function(d) { vis.dualSliderDragged(d); })
+    .on('dragend', function(d) { vis.dualSliderEndedDragging(d);});
   vis.dragTopMarker = d3.behavior.drag()
     .on('dragstart', function(d) { vis.topMarkerStartedDragging(d); })
     .on('drag', function(d) { vis.markerDragged(d); })
@@ -193,14 +197,15 @@ YearSlider.prototype.updateMarkers = function() {
   draggingBox.enter().append('rect')
     .classed('dragging-box', true)
     .attr('fill', '#000')
-    .attr('opacity', 0.8);
+    .attr('opacity', 0.8)
+    .call(vis.dragDualSlider);
   
   draggingBox.transition().duration(250)
     .attr('x', function(d) { return vis.x(d.left) - vis.marker.radius;})
     .attr('width', function(d) { return vis.x(d.right) - vis.x(d.left) + 2*vis.marker.radius;})
     .attr('height', vis.height/2);
   
-  var topMarker = vis.topSlider.selectAll('circle').data([vis.topYear]);
+  topMarker = vis.topSlider.selectAll('circle').data([vis.topYear]);
   // enter
   topMarker.enter()
     .append('circle')
@@ -250,7 +255,7 @@ YearSlider.prototype.bottomMarkerStartedDragging = function(d) {
 }
 
 YearSlider.prototype.markerStartedDragging = function(d) {
-  this[this.draggingSlider].selectAll('circle').classed('dragging', true);
+  // this[this.draggingSlider].selectAll('circle').classed('dragging', true);
 }
 
 YearSlider.prototype.markerDragged = function(d) {
@@ -260,13 +265,27 @@ YearSlider.prototype.markerDragged = function(d) {
   var x = d3.min([d3.max([d3.event.x, 0]), vis.width]);
   vis[vis.draggingSlider].select('circle').attr('cx', x);
   vis[vis.draggingYear] = Math.round(vis.x.invert(x));
+  
+  // update dual slider box
+  xs = d3.extent([
+    +vis.topSlider.select('circle').attr('cx'), 
+    +vis.bottomSlider.select('circle').attr('cx')
+  ]);
+  x0 = xs[0] - vis.marker.radius;
+  width = xs[1] - xs[0] + 2*vis.marker.radius;
+  
+  vis.dualSlider.selectAll('rect')
+    .attr('x', x0)
+    .attr('width', width);
+    
   vis.updateText();
 }
+
 
 YearSlider.prototype.markerEndedDragging = function(d) {
   // set new year values and call update to animate transition into stopping point
   // broadcast new year values
-  this[this.draggingSlider].selectAll('circle').classed('dragging', false);
+  // this[this.draggingSlider].selectAll('circle').classed('dragging', false);
   this.updateMarkers();
   this.eventHandler().broadcast({
     name:'update', 
@@ -274,6 +293,46 @@ YearSlider.prototype.markerEndedDragging = function(d) {
       years: [parseYear(this.topYear.toString()), parseYear(this.bottomYear.toString())]
     }
   });
+}
+
+YearSlider.prototype.dualSliderStartedDragging = function(d) {
+  var vis = this;
+  vis.prevX = d3.event.sourceEvent.x;
+}
+
+YearSlider.prototype.dualSliderDragged = function(d) {
+  var vis = this;
+  var dx = d3.event.sourceEvent.x - vis.prevX;
+  vis.prevX = d3.event.sourceEvent.x;
+  
+  var topYearMarker = vis.topSlider.select('circle');
+  var bottomYearMarker = vis.bottomSlider.select('circle');
+  
+  // update x
+  var newTopYearX = vis.updateCircleX(+topYearMarker.attr('cx'), dx);
+  var newBottomYearX = vis.updateCircleX(+bottomYearMarker.attr('cx'), dx);
+  
+  topYearMarker.attr('cx', newTopYearX);
+  bottomYearMarker.attr('cx', newBottomYearX);
+  
+  // update dragging years
+  vis.topYear = Math.round(vis.x.invert(newTopYearX));
+  vis.bottomYear = Math.round(vis.x.invert(newBottomYearX));
+  vis.dualSlider.select('rect')
+    .attr('x', d3.min([newTopYearX - vis.marker.radius, newBottomYearX - vis.marker.radius]))
+    .attr('width', Math.abs(newTopYearX - newBottomYearX) + 2*vis.marker.radius);
+  
+  vis.updateText();
+}
+
+YearSlider.prototype.updateCircleX = function(cx, dx) {
+  console.log('CX:'+ cx);
+  console.log('DX:'+ dx);
+  return d3.min([d3.max([cx+dx, 0]), this.width]);
+}
+
+YearSlider.prototype.dualSliderEndedDragging = function(d) {
+  this.markerEndedDragging(d);
 }
 
 YearSlider.prototype.questionClicked = function() {
