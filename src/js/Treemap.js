@@ -2,7 +2,7 @@
 function Treemap(parentElem, data) {
   this.parentElem = parentElem;
   this.treeData = data;
-  this.year_index = 0;
+  this.year_index = data.years[1]-data.years[0];
 }
 
 Treemap.prototype.eventHandler = function(eventHandler) {
@@ -19,7 +19,11 @@ Treemap.prototype.eventHandler = function(eventHandler) {
 }
 
 Treemap.prototype.switchView = function(event) {
-  
+  var vis = this;
+  var opacity = vis.graph.attr('opacity');
+  opacity = (opacity == 1) ? 0:1;
+  vis.graph.transition().duration(1000)
+    .attr('opacity', opacity);
 }
 
 Treemap.prototype.handleResize = function(event) {
@@ -28,14 +32,21 @@ Treemap.prototype.handleResize = function(event) {
 }
 
 Treemap.prototype.handleUpdate = function(event) {
-  
+  var vis = this;
+  var year_index = event.year - 2003;
+  if (year_index != vis.year_index) {
+    vis.year_index = event.year - 2003;
+    vis.update();
+  }
 }
 
 Treemap.prototype.initVis = function() {
   var vis = this;
   
   vis.svg = d3.select('#'+vis.parentElem).append('svg');
-  vis.graph = vis.svg.append('g').classed('chart', true);
+  vis.graph = vis.svg.append('g')
+    .classed('chart', true)
+    .attr('opacity', 1);
   
   vis.x = d3.scale.linear();
   vis.y = d3.scale.linear();
@@ -71,14 +82,17 @@ Treemap.prototype.resize = function() {
 }
 
 Treemap.prototype.wrangleData = function(options) {
-  vis.displayData = vis.treeData;
+  // data needs no wrangling, this function placed here for consistency
+  this.displayData = this.treeData;
 }
 
 Treemap.prototype.update = function(options) {
   var vis = this;
+  
+  vis.wrangleData(options);
         
-  var node = vis.treeData;
-  var root = vis.treeData;
+  var node = vis.displayData;
+  var root = vis.displayData;
 
   var nodes = vis.treemap.nodes(root)
       .filter(function(d) { return !d.children; });
@@ -95,11 +109,12 @@ Treemap.prototype.update = function(options) {
     .attr("text-anchor", "middle")
     .text(function(d) { return d.name; })
   // Update        
-  cells.attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
-  cells.selectAll('rect')
+  cells.transition().duration(1000)
+    .attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
+  cells.selectAll('rect').transition().duration(1000)
     .attr("width", function(d) { return d.dx - 1; })
     .attr("height", function(d) { return d.dy - 1; })
-  cells.selectAll('text')
+  cells.selectAll('text').transition().duration(1000)
     .attr("x", function(d) { return d.dx / 2; })
     .attr("y", function(d) { return d.dy / 2; })
     .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; })
@@ -115,19 +130,19 @@ Treemap.prototype.zoom = function(d) {
   vis.y.domain([d.y, d.y + d.dy]);
 
   var t = vis.graph.selectAll(".cell").transition()
-      .duration(d3.event.altKey ? 7500 : 750)
-      .attr("transform", function (d) {
-          return "translate(" + vis.x(d.x ) + "," + vis.y(d.y ) + ")";
-      });
+    .duration(d3.event.altKey ? 7500 : 750)
+    .attr("transform", function (d) {
+        return "translate(" + vis.x(d.x ) + "," + vis.y(d.y ) + ")";
+    });
 
   t.select("rect")
-      .attr("width", function (d) { return kx * d.dx - 1; })
-      .attr("height", function (d) { return ky * d.dy - 1; })
+    .attr("width", function (d) { return kx * d.dx - 1; })
+    .attr("height", function (d) { return ky * d.dy - 1; })
 
   t.select("text")
-      .attr("x", function (d) { return kx * d.dx / 2; })
-      .attr("y", function (d) { return ky * d.dy / 2; })
-      .style("opacity", function (d) { return kx * d.dx > d.w ? 1 : 0; });
+    .attr("x", function (d) { return kx * d.dx / 2; })
+    .attr("y", function (d) { return ky * d.dy / 2; })
+    .style("opacity", function (d) { return kx * d.dx > d.w ? 1 : 0; });
 
   node = d;
   //no need to stop propogation on brush events

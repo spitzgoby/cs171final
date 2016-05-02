@@ -73,7 +73,8 @@ function loadData(error, topo, deaths, income, unemployment, drugUse) {
  ***--------------------------------***/
 
 var handler = new EventHandler();
-d3.select(window).on('resize', function() {handler.broadcast({name: 'resize'})});
+d3.select(window).on('resize', function() {handler.broadcast({name: 'resize'});});
+d3.select('#switch-view-button').on('click', function() {handler.broadcast({name: 'switchView'});});
 
 // creates and initializes all visualizations 
 function createVis(topo, deaths, income, unemployment, drugUse) {
@@ -88,9 +89,11 @@ function createVis(topo, deaths, income, unemployment, drugUse) {
   yearSlider.eventHandler(handler).initVis();
   handler.on('question-clicked', this, displaySliderDescription);
   
-  console.log(drugUse);
   treemap = new Treemap('treemap-area', drugUse);
   treemap.eventHandler(handler).initVis();
+  
+  singleYearSlider = new SingleYearSlider('single-year-slider', [2003, 2013]);
+  singleYearSlider.eventHandler(handler).initVis();
 }
 
 // update visualizations based on selected options
