@@ -84,21 +84,22 @@ Treemap.prototype.update = function(options) {
       .filter(function(d) { return !d.children; });
       
   var cells = vis.graph.selectAll(".cell").data(nodes);
-  var cellGroups = cells.enter().append("g").attr("class", "cell")
-      .attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
+  
+  // Enter
+  var cellsEnter = cells.enter().append("g").attr("class", "cell")
       .on("click", function(d) { return vis.zoom(node == d.parent ? root : d.parent); });
-  cellGroups.append("rect")
+  cellsEnter.append("rect")
     .style("fill", function(d) { return vis.color(d.parent.name); });
-        
-  cellGroups.append("text")
+  cellsEnter.append("text")
     .attr("dy", ".35em")
     .attr("text-anchor", "middle")
     .text(function(d) { return d.name; })
-          
-  cellGroups.selectAll('rect')
+  // Update        
+  cells.attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
+  cells.selectAll('rect')
     .attr("width", function(d) { return d.dx - 1; })
     .attr("height", function(d) { return d.dy - 1; })
-  cellGroups.selectAll('text')
+  cells.selectAll('text')
     .attr("x", function(d) { return d.dx / 2; })
     .attr("y", function(d) { return d.dy / 2; })
     .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; })
@@ -110,7 +111,6 @@ Treemap.prototype.zoom = function(d) {
   var vis = this;
 
   var kx = (vis.width) / d.dx, ky = (vis.height) / d.dy;
-  vis.year_index = 0
   vis.x.domain([d.x, d.x + d.dx]);
   vis.y.domain([d.y, d.y + d.dy]);
 
