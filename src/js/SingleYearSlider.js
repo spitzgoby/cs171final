@@ -1,12 +1,33 @@
 
+/*--------------------*
+ *** INITIALIZATION ***
+ *--------------------*/
+
+/**
+ * Creats a new SingleYearSlider
+ *
+ * @param parentElem  The DOM element within which the slider should be drawn
+ * @param years       An array of years to show in the slider
+ * @return SingleYearSlider
+ */
 function SingleYearSlider(parentElem, years) {
   this.parentElem = parentElem;
   this.years = years;
 }
 
+/**
+ * If a handler is specified the Treemap updates its event handler and registers 
+ * listeners for the events for which it's interested. The receiving object is 
+ * returned.
+ * If no handler is given returns the object's current handler.
+ *
+ * @param handler (OptionaL)  The event handler for the object
+ * @return Treemap|EventHandler
+ */
 SingleYearSlider.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
+    this._eventhandler.on('resize', this, this.handleResize);
     
     return this;
   }
@@ -14,6 +35,13 @@ SingleYearSlider.prototype.eventHandler = function(eventHandler) {
   return this._eventHandler;
 }
 
+/**
+ * Initializes the visualization by appending the necessary svg groups and 
+ * defining scales and axes. Should only be called once on a given stacked area
+ * chart.
+ *
+ * @return SingleYearSlider
+ */
 SingleYearSlider.prototype.initVis = function() {
   var vis = this;
   
@@ -53,9 +81,21 @@ SingleYearSlider.prototype.initVis = function() {
     .attr("r", 9);
     
   vis.resize();
+  
+  return vis;
 }
 
-SingleYearSlider.prototype.resize = function(options) {
+
+/*--------------*
+ *** RESIZING ***
+ *--------------*/
+
+/**
+ * Resizes the visualization and redraws it within its parent element.
+ *
+ * @return SingleYearSlider
+ */
+SingleYearSlider.prototype.resize = function() {
   var vis = this;
   
   vis.margin = { top: 10, left: 100, right: 100, bottom: 0};
@@ -78,8 +118,17 @@ SingleYearSlider.prototype.resize = function(options) {
     .attr("height", 100);
     
   vis.update({ year:vis.years[vis.years.length-1] });
+  
+  return vis;
 }
 
+/**
+ * Updates the visualization according to the new data year
+ * Accepted Options: (currently none)
+ *
+ * @param options Options for redrawing the visualization 
+ * @return SingleYearSlider
+ */
 SingleYearSlider.prototype.update = function(options) {
   var vis = this;
   
@@ -93,6 +142,17 @@ SingleYearSlider.prototype.update = function(options) {
     .call(vis.brush.event);
 }
 
+
+/*--------------------*
+ *** EVENT HANDLERS ***
+ *--------------------*/
+ 
+/**
+ * Handles brush events by moving the slider handle and broadcasting the change 
+ * in years.
+ *
+ * @return SingleYearSlider
+ */
 SingleYearSlider.prototype.brushed = function() {
   var vis = this;
   var value = Math.round(vis.brush.extent()[0]);
@@ -102,4 +162,19 @@ SingleYearSlider.prototype.brushed = function() {
   }
 
   vis.handle.attr("cx", vis.x(value));
+  
+  return vis;
+}
+
+/**
+ * Handles resize events 
+ *
+ * @return SingleYearSlider
+ */
+SingleYearSlider.prototype.handleResize = function(event) {
+  var vis = this;
+  
+  vis.resize();
+  
+  return vis;
 }

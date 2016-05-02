@@ -1,8 +1,28 @@
+/*--------------------*
+ *** INITIALIZATION ***
+ *--------------------*/
+ 
+/**
+ * Creates a new DrugTypeLegend
+ *
+ * @param parentElem  The DOM element within which the legend should be drawn
+ * @param types       The drug types displayed in the legend
+ * @return DrugTypeLegend
+ */
 function DrugTypeLegend(parentElem, types) {
   this.parentElem = parentElem;
   this.types = types;
 }
 
+/**
+ * If a handler is specified the legend updates its event handler and registers 
+ * listeners for the events for which it's interested. The receiving object is 
+ * returned.
+ * If no handler is given returns the object's current handler.
+ *
+ * @param handler (OptionaL)  The event handler for the object
+ * @return DrugTypeLegend|EventHandler
+ */
 DrugTypeLegend.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
@@ -14,6 +34,11 @@ DrugTypeLegend.prototype.eventHandler = function(eventHandler) {
   return this._eventHandler;
 }
 
+/**
+ * Initializes the drug legend's svg and groups
+ *
+ * @return DrugTypeLegend
+ */
 DrugTypeLegend.prototype.initVis = function() {
   var vis = this;
     
@@ -21,12 +46,21 @@ DrugTypeLegend.prototype.initVis = function() {
   vis.legend = vis.svg.append('g').classed('legend', true);
   
   vis.resize();
+  
+  return vis;
 }
 
-DrugTypeLegend.prototype.handleResize = function(event) {
-  this.resize();
-}
 
+/*--------------*
+ *** RESIZING ***
+ *--------------*/
+ 
+
+/**
+ * Resizes the visualization according to the width of its parent element
+ *
+ * @return DrugTypeLegend
+ */
 DrugTypeLegend.prototype.resize = function() {
   var vis = this;
   vis.margin = {top: 10, right: 100, bottom: 10, left: 100};
@@ -40,22 +74,38 @@ DrugTypeLegend.prototype.resize = function() {
   vis.legend.attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")");
   
   vis.update();
+  
+  return vis;
 }
 
+
+/*---------------------------*
+ *** DRAWING VISUALIZATION ***
+ *---------------------------*/
+
+/**
+ * Updates the visualization
+ *
+ * @return DrugTypeLegend
+ */
 DrugTypeLegend.prototype.update = function() {
   var vis = this;
   
+  // get width of each legend element
   var elementWidth = vis.width/vis.types.length;
   var elements = vis.legend.selectAll("g").data(vis.types);
+  
+  // enter
   var elementsEnter = elements.enter().append("g")
     .attr("class", "legend")
     .attr('width', elementWidth);
-
+    
   elementsEnter.append('rect');
   elementsEnter.append('text')
     .attr("dy", ".35em")
     .attr("text-anchor", "middle");
   
+  // update
   elements
     .attr('transform', function(d,i) {
       return 'translate('+ (i * elementWidth) +',0)';
@@ -71,5 +121,20 @@ DrugTypeLegend.prototype.update = function() {
     .text(function(d) { return d.replace('_', ' '); })
     .attr("x", elementWidth/2)
     .attr("y", 30);
+  
+  return vis;
 }
 
+
+/*--------------*
+ *** RESIZING ***
+ *--------------*/
+
+/**
+ * Responds to resize events
+ *
+ * @return DrugTypeLegend
+ */
+DrugTypeLegend.prototype.handleResize = function(event) {
+  this.resize();
+}
