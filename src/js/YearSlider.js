@@ -56,10 +56,11 @@ YearSlider.prototype.initVis = function() {
     .domain(vis.range);
   
   /* * DRAWING GROUPS ***/
-  vis.yearsText = vis.slider.append('g').classed('years', true);
-  
+  vis.dualSlider = vis.slider.append('g').classed('slider dual', true);
   vis.topSlider = vis.slider.append('g').classed('slider top', true);
   vis.bottomSlider = vis.slider.append('g').classed('slider bottom', true);
+  
+  vis.yearsText = vis.slider.append('g').classed('years', true);
   
   vis.topAxis = vis.topSlider.append('g').classed('axis top-axis', true);
   vis.bottomAxis = vis.bottomSlider.append('g').classed('axis bottom', true);
@@ -131,6 +132,7 @@ YearSlider.prototype.resize = function() {
   /*** RESIZE DRAWING GROUPS ***/
   vis.topSlider.attr('transform', 'translate(0,'+ Math.floor(vis.height / 4) +')');
   vis.bottomSlider.attr('transform', 'translate(0,'+ vis.height / 4 * 3 +')');
+  vis.dualSlider.attr('transform', 'translate(0,'+ (vis.height / 4) +')');
   
   vis.topAxisLine
     .attr('x0', 0)
@@ -171,11 +173,32 @@ YearSlider.prototype.updateText = function() {
   vis.yearsText.selectAll('text')
     .attr('font-weight', function(d) {
       return (d >= minYear && d <= maxYear) ? 'bold' : 'lighter';
+    })
+    .attr('fill', function(d) {
+      return (d >= minYear && d <= maxYear) ? '#fff' : '#333';
     });
 }
 
 YearSlider.prototype.updateMarkers = function() {
   var vis = this;
+  
+  var draggingBoxData;
+  if (vis.bottomYear < vis.topYear) {
+    draggingBoxData = [{left:vis.bottomYear, right:vis.topYear}];
+  } else {
+    draggingBoxData = [{left:vis.topYear, right:vis.bottomYear}];
+  }
+  
+  var draggingBox = vis.dualSlider.selectAll('rect').data(draggingBoxData);
+  draggingBox.enter().append('rect')
+    .classed('dragging-box', true)
+    .attr('fill', '#000')
+    .attr('opacity', 0.8);
+  
+  draggingBox.transition().duration(250)
+    .attr('x', function(d) { return vis.x(d.left) - vis.marker.radius;})
+    .attr('width', function(d) { return vis.x(d.right) - vis.x(d.left) + 2*vis.marker.radius;})
+    .attr('height', vis.height/2);
   
   var topMarker = vis.topSlider.selectAll('circle').data([vis.topYear]);
   // enter
