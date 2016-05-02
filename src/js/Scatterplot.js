@@ -8,7 +8,6 @@
  *
  * @param parentElem    The ID of the DOM element within which the visualization
  *                      should be drawn.
- * @param handler       The event handler for the visualization
  * @param deaths        An array of death data sorted alphabetically by state
  * @param income        An array of income data sorted alphabetically by state
  * @param unemployment  An array of unemployment data sorted alphabetically by 
