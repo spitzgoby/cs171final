@@ -19,6 +19,7 @@ function Treemap(parentElem, chartElem, data) {
   this.treeData = data;
   this.year_index = data.years[1]-data.years[0];
   this.visible = true;
+  this.zoomed = false;
 }
 
 /**
@@ -133,7 +134,7 @@ Treemap.prototype.update = function(options) {
   
   vis.wrangleData(options);
         
-  var node = vis.displayData;
+  vis.node = vis.displayData;
   var root = vis.displayData;
 
   var nodes = vis.treemap.nodes(root)
@@ -143,7 +144,7 @@ Treemap.prototype.update = function(options) {
   
   // Enter
   var cellsEnter = cells.enter().append("g").attr("class", "cell")
-      .on("click", function(d) { console.log('clicked'); return vis.zoom(node == d.parent ? root : d.parent); });
+      .on("click", function(d) { return vis.zoom(vis.node === d.parent ? root : d.parent); });
   cellsEnter.append("rect")
     .style("fill", function(d) { return drugColors(d.parent.name); });
   cellsEnter.append("text")
@@ -186,9 +187,11 @@ Treemap.prototype.zoom = function(d) {
     .attr("y", function (d) { return ky * d.dy / 2; })
     .style("opacity", function (d) { return kx * d.dx > d.w ? 1 : 0; });
 
-  node = d;
+  vis.node = d;
   //no need to stop propogation on brush events
   if(d3.event.type != "brush"){d3.event.stopPropagation();}
+  
+  vis.zoomed = !vis.zoomed;
 }
 
 
