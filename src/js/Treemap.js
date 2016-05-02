@@ -50,7 +50,6 @@ Treemap.prototype.initVis = function() {
   
   vis.x = d3.scale.linear();
   vis.y = d3.scale.linear();
-  vis.color = d3.scale.category20();
   
   vis.treemap = d3.layout.treemap()
     .round(false)
@@ -103,7 +102,7 @@ Treemap.prototype.update = function(options) {
   var cellsEnter = cells.enter().append("g").attr("class", "cell")
       .on("click", function(d) { return vis.zoom(node == d.parent ? root : d.parent); });
   cellsEnter.append("rect")
-    .style("fill", function(d) { return vis.color(d.parent.name); });
+    .style("fill", function(d) { return drugColors(d.parent.name); });
   cellsEnter.append("text")
     .attr("dy", ".35em")
     .attr("text-anchor", "middle")

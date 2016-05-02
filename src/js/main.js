@@ -8,9 +8,10 @@ var formatCurrency = d3.format('$');
 var formatIdentity = function(str) { return str; };
 
 // universal color scale
-colorbrewer.Purples[6].unshift('#ffffff');
-var colors = d3.scale.quantile()
+colorbrewer.Purples[6].unshift('#ffffff'); // unshift places white as the first color
+var stateColors = d3.scale.quantile()
   .range(colorbrewer.Purples[6]);
+var drugColors = d3.scale.category20();
     
 /***---------------------***
  *** LOAD AND PARSE DATA ***
@@ -94,6 +95,10 @@ function createVis(topo, deaths, income, unemployment, drugUse) {
   
   singleYearSlider = new SingleYearSlider('single-year-slider', [2003, 2013]);
   singleYearSlider.eventHandler(handler).initVis();
+  
+  drugTypes = drugUse.children.map(function(d) { return d.name; }).reverse();
+  drugTypeLegend = new DrugTypeLegend('drug-type-legend', drugTypes);
+  drugTypeLegend.eventHandler(handler).initVis();
 }
 
 // update visualizations based on selected options

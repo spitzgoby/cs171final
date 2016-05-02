@@ -189,12 +189,12 @@ Choropleth.prototype.update = function(options) {
   
   var duration = options.duration ? options.duration : vis.default.duration;
   // change colors domain
-  colors.domain([0, 1, 5, 10, 15, 20]);
+  stateColors.domain([0, 1, 5, 10, 15, 20]);
   
   vis.keyTitle.html('Deaths Per 100,000 <tspan class="death-rate-year">('+ 
     formatYear(vis.deathRateYear) +')</tspan>');
   
-  var keyRects = vis.key.selectAll('rect').data(colors.domain());
+  var keyRects = vis.key.selectAll('rect').data(stateColors.domain());
   keyRects.enter().append('rect')
     .classed('key-rect', true);
   keyRects.transition().duration(duration)
@@ -202,14 +202,14 @@ Choropleth.prototype.update = function(options) {
     .attr('y', vis.keyRectHeight)
     .attr('width', vis.keyWidth)
     .attr('height', vis.keyRectHeight)
-    .attr('fill', function(d) { return colors(d); });
+    .attr('fill', function(d) { return stateColors(d); });
   
-  var keyLabels = vis.key.selectAll('.key-label').data(colors.domain())
+  var keyLabels = vis.key.selectAll('.key-label').data(stateColors.domain())
   keyLabels.enter().append('text')
     .classed('key-label', true);
   keyLabels.transition().duration(duration)
     .text(function(d, i) { 
-      if (i == colors.domain().length - 1) return d +'+';
+      if (i == stateColors.domain().length - 1) return d +'+';
       return d; 
     })
     .attr('x', function(d,i) { return i * vis.keyWidth + 2;})
@@ -227,7 +227,7 @@ Choropleth.prototype.update = function(options) {
   vis.states.transition().duration(duration)
     .attr('d', vis.path)
     .attr('fill', function(d, i) { 
-      return colors(vis.displayData[i].death_rate); });
+      return stateColors(vis.displayData[i].death_rate); });
   
   return vis;
 }
