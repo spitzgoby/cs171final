@@ -1,4 +1,18 @@
 
+/*--------------------*
+ *** INITIALIZATION ***
+ *--------------------*/
+ 
+/**
+ * Creates a new treemap
+ *
+ * @param parentElem  The ID of the DOM element within which the visualization
+ *                    should be drawn.
+ * @param chartElem   The ID of the DOM SVG element within which the 
+ *                    visualization should be drawn. 
+ * @param data        An array of substance abuse data organized by year
+ * @return Treemap
+ */
 function Treemap(parentElem, chartElem, data) {
   this.parentElem = parentElem;
   this.chartElem = chartElem;
@@ -6,6 +20,15 @@ function Treemap(parentElem, chartElem, data) {
   this.year_index = data.years[1]-data.years[0];
 }
 
+/**
+ * If a handler is specified the Treemap updates its event handler and registers 
+ * listeners for the events for which it's interested. The receiving object is 
+ * returned.
+ * If no handler is given returns the object's current handler.
+ *
+ * @param handler (OptionaL)  The event handler for the object
+ * @return Treemap|EventHandler
+ */
 Treemap.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
@@ -19,27 +42,14 @@ Treemap.prototype.eventHandler = function(eventHandler) {
   return this._eventHandler;
 }
 
-Treemap.prototype.switchView = function(event) {
-  var vis = this;
-  var opacity = (vis.graph.attr('opacity') == 1) ? 0 : 1;
-  vis.graph.transition().duration(1000)
-    .attr('opacity', opacity);
-}
 
-Treemap.prototype.handleResize = function(event) {
-  console.log('resizing');
-  this.resize();
-}
-
-Treemap.prototype.handleUpdate = function(event) {
-  var vis = this;
-  var year_index = event.year - 2003;
-  if (year_index != vis.year_index) {
-    vis.year_index = event.year - 2003;
-    vis.update();
-  }
-}
-
+/**
+ * Initializes the visualization by appending the necessary svg groups and 
+ * defining scales and axes. Should only be called once on a given stacked area
+ * chart.
+ *
+ * @return StackedAreaChart
+ */
 Treemap.prototype.initVis = function() {
   var vis = this;
   
@@ -63,6 +73,16 @@ Treemap.prototype.initVis = function() {
   vis.resize();
 }
 
+
+/*------------*
+ *** SIZING ***
+ *------------*/
+
+/**
+ * Resizes the visualization and redraws it within its parent element.
+ *
+ * @return Choropleth
+ */
 Treemap.prototype.resize = function() {
   var vis = this;
     
@@ -84,11 +104,29 @@ Treemap.prototype.resize = function() {
   vis.update();
 }
 
+
+/*---------------------------*
+ *** DRAWING VISUALIZATION ***
+ *---------------------------*/
+
+/**
+ * Coerces data into an array the state's ID and death rate.
+ * Accepted Options: (currently none)
+ *
+ * @param options The options for wrangling data
+ */
 Treemap.prototype.wrangleData = function(options) {
   // data needs no wrangling, this function placed here for consistency
   this.displayData = this.treeData;
 }
 
+/**
+ * Updates the visualization according to the new data year
+ * Accepted Options: (currently none)
+ *
+ * @param options Options for redrawing the visualization 
+ * @return Treemap
+ */
 Treemap.prototype.update = function(options) {
   var vis = this;
   
@@ -150,4 +188,50 @@ Treemap.prototype.zoom = function(d) {
   node = d;
   //no need to stop propogation on brush events
   if(d3.event.type != "brush"){d3.event.stopPropagation();}
+}
+
+
+/*--------------------*
+ *** EVENT HANDLERS ***
+ *--------------------*/
+
+/**
+ * Switch the opacity of the visualization
+ *
+ * @return Treemap
+ */
+Treemap.prototype.switchView = function(event) {
+  var vis = this;
+  var opacity = (vis.graph.attr('opacity') == 1) ? 0 : 1;
+  vis.graph.transition().duration(1000)
+    .attr('opacity', opacity);
+}
+
+/**
+ * Handles a resize event from the visualization's event handler.
+ *
+ * @return Treemap
+ */
+Treemap.prototype.handleResize = function(event) {
+  console.log('resizing');
+  this.resize();
+  return this;
+}
+
+/**
+ * Handles update events by calling the visualizations update method
+ *
+ * @param event Event data
+ * @return Treemap
+ */
+Treemap.prototype.handleUpdate = function(event) {
+  var vis = this;
+  
+  var year_index = event.year - 2003;
+  if (year_index != vis.year_index) {
+    vis.year_index = year_index;
+    vis.update();
+  }
+  
+  return vis;
 }
