@@ -76,7 +76,6 @@ Treemap.prototype.initVis = function() {
   vis.tip = d3.tip()
     .attr('class', 'd3-tip')
     .html(function(d) {
-        console.log(d);
         return "Substance Type: "+ d.name + "<br> Number of People Seeking Treatment : " + d.size[vis.year_index];
     });
   vis.graph.call(vis.tip);
@@ -243,7 +242,6 @@ Treemap.prototype.unhighlightSubstance = function(d) {
  * @return Treemap
  */
 Treemap.prototype.switchView = function(event) {
-  console.log('swtiching view')
   var vis = this;
   // update visibility
   vis.visible = !vis.visible;
@@ -261,7 +259,6 @@ Treemap.prototype.switchView = function(event) {
  * @return Treemap
  */
 Treemap.prototype.handleResize = function(event) {
-  console.log('resizing');
   this.resize();
   return this;
 }
