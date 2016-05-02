@@ -6,6 +6,10 @@ $factor-light-color: #6CD16C;
 #year-slider {
   margin-top: 10px;  
   
+  .dual:hover {
+    cursor: pointer;
+  }  
+  
   .axis-label {
     font-weight: bold;
   }

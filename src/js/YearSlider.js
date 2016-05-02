@@ -117,7 +117,7 @@ YearSlider.prototype.resize = function() {
   
   // update width with new parameters
   vis.width = parseInt(d3.select('#'+vis.parentElem).style('width')) - vis.margin.left - vis.margin.right;
-  vis.height = (1/3) * vis.width;
+  vis.height = (1/2) * vis.width;
   
   /*** RESIZE SVG AND MAIN GROUP ***/
   vis.svg
@@ -326,8 +326,6 @@ YearSlider.prototype.dualSliderDragged = function(d) {
 }
 
 YearSlider.prototype.updateCircleX = function(cx, dx) {
-  console.log('CX:'+ cx);
-  console.log('DX:'+ dx);
   return d3.min([d3.max([cx+dx, 0]), this.width]);
 }
 
