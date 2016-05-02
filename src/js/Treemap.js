@@ -21,8 +21,7 @@ Treemap.prototype.eventHandler = function(eventHandler) {
 
 Treemap.prototype.switchView = function(event) {
   var vis = this;
-  var opacity = vis.graph.attr('opacity');
-  opacity = (opacity == 1) ? 0:1;
+  var opacity = (vis.graph.attr('opacity') == 1) ? 0 : 1;
   vis.graph.transition().duration(1000)
     .attr('opacity', opacity);
 }

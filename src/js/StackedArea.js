@@ -23,9 +23,7 @@ StackedAreaChart.prototype.handleResize = function(event) {
 
 StackedAreaChart.prototype.switchView = function(event) {
   var vis = this;
-  var opacity = vis.graph.attr('opacity');
-  opacity = (opacity == 1) ? 0 : 1;
-  console.log(opacity);
+  var opacity = (vis.graph.attr('opacity') == 1) ? 0 : 1 ;
   vis.graph.transition().duration(1000)
     .attr('opacity', opacity);
 }
