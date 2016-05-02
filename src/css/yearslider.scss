@@ -23,8 +23,13 @@ $factor-light-color: #6CD16C;
     }
   }
   
-  circle:hover {
-    cursor: pointer;  
+  circle {
+    stroke-width: 1px;
+    stroke: #fff;  
+    
+    &:hover {
+      cursor: pointer;  
+    }
   }
   
   .years {
