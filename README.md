@@ -21,6 +21,11 @@ inspired by the excellent examples at [Blocks](http://bl.ocks.org/). Our code
 can be found in the `src/js` directory and encompasses the initialization, data
 loading, and drawing of the visualizations. 
 
+We also utilized [Gulp](http://gulpjs.com/) and [Sass](http://sass-lang.com/) to
+speed up the implementation process. In order to build the code you must first 
+install `npm` and then run `npm install`. Next, run `gulp libs` and finally 
+`gulp` from the command line in the root project directory.
+
 ### Choropleth and Scatterplot
 This pair of visualizations focuses on how economic factors have influenced drug
 death rates. The choropleth provides a quick overview of the problem, and the 
