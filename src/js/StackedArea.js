@@ -239,7 +239,7 @@ StackedAreaChart.prototype.makeSubstanceTable = function(data){
   for(var i=0;i<data.length;i++){
       table += "<tr>"+
               "<td>" + data[i].date.getFullYear() + "</td>" +
-              "<td>" + (parseInt(data[i].y*2100000)) + "</td>" +
+              "<td>" + StackedAreaChart.format(parseInt(data[i].y)) + "</td>" +
           "</tr>";
   }
   return table;
@@ -272,3 +272,5 @@ StackedAreaChart.prototype.switchView = function(event) {
     
   return vis;
 }
+
+StackedAreaChart.format = d3.format("0,000");

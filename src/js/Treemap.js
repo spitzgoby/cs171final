@@ -76,7 +76,7 @@ Treemap.prototype.initVis = function() {
   vis.tip = d3.tip()
     .attr('class', 'd3-tip')
     .html(function(d) {
-        return "Substance Type: "+ d.name + "<br> Number of People Seeking Treatment : " + d.size[vis.year_index];
+        return "Substance Type: "+ d.name + "<br> Number of People Seeking Treatment : " + StackedAreaChart.format(d.size[vis.year_index]);
     });
   vis.graph.call(vis.tip);
 
@@ -279,3 +279,5 @@ Treemap.prototype.handleUpdate = function(event) {
   
   return vis;
 }
+
+Treemap.format = d3.format("0,000");
