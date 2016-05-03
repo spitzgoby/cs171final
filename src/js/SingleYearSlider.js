@@ -27,6 +27,7 @@ function SingleYearSlider(parentElem, years) {
 SingleYearSlider.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
+    this._eventHandler.on('switchView', this, this.switchView);
     
     return this;
   }
@@ -46,7 +47,7 @@ SingleYearSlider.prototype.initVis = function() {
   
   vis.svg = d3.select('#'+vis.parentElem).append("svg");
   vis.graph = vis.svg.append('g')
-    .attr("class", "slider")
+    .attr("class", "slider").attr('opacity', 1); // starts visible
 
   vis.x = d3.scale.linear()
     .domain(vis.years)
@@ -164,6 +165,12 @@ SingleYearSlider.prototype.brushed = function() {
   vis.handle.attr("cx", vis.x(value));
   
   return vis;
+}
+
+SingleYearSlider.prototype.switchView = function(event) {
+  var vis = this;
+  vis.graph.transition().duration(1000)
+    .attr('opacity', (+vis.graph.attr('opacity') == 1) ? 0 : 1);
 }
 
 /**

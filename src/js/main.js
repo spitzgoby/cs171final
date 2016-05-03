@@ -2,12 +2,11 @@
 // convert year strings to date objects
 var formatYear = d3.time.format('%Y');
 var parseYear = formatYear.parse;
-
 var formatPercent = d3.format('%');
 var formatCurrency = d3.format('$');
 var formatIdentity = function(str) { return str; };
 
-// universal color scale
+// universal color scales
 colorbrewer.Purples[6].unshift('#ffffff'); // unshift places white as the first color
 var stateColors = d3.scale.quantile()
   .range(colorbrewer.Purples[6]);
@@ -87,7 +86,9 @@ function loadData(error, topo, deaths, income, unemployment, drugUse, treatment)
 var handler = new EventHandler();
 // couldn't fix bugs with treemap sticky layout, so resizing messages are suppressed
 // d3.select(window).on('resize', function() {handler.broadcast({name: 'resize'});});
-d3.select('#switch-view-button').on('click', function() {handler.broadcast({name: 'switchView'});});
+d3.select('#switch-view-button').on('click', function() {
+  handler.broadcast({name: 'switchView'});
+});
 
 // creates and initializes all visualizations 
 function createVis(topo, deaths, income, unemployment, drugUse, treatment) {

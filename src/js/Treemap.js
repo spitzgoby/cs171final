@@ -54,6 +54,8 @@ Treemap.prototype.eventHandler = function(eventHandler) {
 Treemap.prototype.initVis = function() {
   var vis = this;
   
+  d3.select('#chart-title').text('Drug Treatment Cases By Substance Type');
+  
   vis.svg = d3.select('#'+vis.parentElem).selectAll('svg#'+vis.chartElem);
   if (vis.svg.empty()) {
     vis.svg = d3.select('#'+vis.parentElem).append('svg');
