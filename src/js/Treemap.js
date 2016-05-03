@@ -35,7 +35,6 @@ Treemap.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
     this._eventHandler.on('switchView', this, this.switchView);
-    this._eventHandler.on('resize', this, this.handleResize);
     this._eventHandler.on('updateDrugs', this, this.handleUpdate);
     
     return this;
@@ -69,8 +68,7 @@ Treemap.prototype.initVis = function() {
   
   vis.treemap = d3.layout.treemap()
     .round(false)
-    .sticky(true)
-    .value(function(d) { return d.size[vis.year_index]; });
+    .sticky(true);
 
     /*** treemap TIP ***/
   vis.tip = d3.tip()
@@ -111,7 +109,6 @@ Treemap.prototype.resize = function() {
   vis.x.range([0, vis.width]);
   vis.y.range([0, vis.height]);
 
-
   vis.update();
 }
 
@@ -128,7 +125,6 @@ Treemap.prototype.resize = function() {
  */
 Treemap.prototype.wrangleData = function(options) {
   // data needs no wrangling, this function placed here for consistency
-  this.displayData = this.treeData;
 }
 
 /**
@@ -142,12 +138,14 @@ Treemap.prototype.update = function(options) {
   var vis = this;
   
   vis.wrangleData(options);
-        
+  
+  vis.displayData = JSON.parse(JSON.stringify(this.treeData));
+  
+  vis.treemap.value(function(d) { return d.size[vis.year_index]; });
+  var nodes = vis.treemap.nodes(vis.displayData)
+      .filter(function(d) { return !d.children; });
   vis.node = vis.displayData;
   var root = vis.displayData;
-
-  var nodes = vis.treemap.nodes(root)
-      .filter(function(d) { return !d.children; });
       
   var cells = vis.graph.selectAll(".cell").data(nodes);
   
@@ -161,20 +159,19 @@ Treemap.prototype.update = function(options) {
   cellsEnter.append("text")
     .attr("dy", ".35em")
     .attr("text-anchor", "middle")
-    .text(function(d) { return d.name; })
+    .text(function(d) { return d.name; });
+    
   // Update        
   cells.transition().duration(1000)
-    .attr("transform", function(d) { return "translate(" + ( d.x) + "," + ( + d.y) + ")"; })
+    .attr("transform", function(d) { return "translate(" + (d.x) + "," + (d.y) + ")"; })
   cells.selectAll('rect').transition().duration(1000)
     .attr("width", function(d) { return d.dx - 1; })
     .attr("height", function(d) { return d.dy - 1; });
 
-    cells.selectAll('text').transition().duration(1000)
+  cells.selectAll('text').transition().duration(1000)
     .attr("x", function(d) { return d.dx / 2; })
     .attr("y", function(d) { return d.dy / 2; })
-    .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; })
-
-  d3.select(window).on("click", function() { vis.zoom(root); });
+    .style("opacity", function(d) { d.w = this.getComputedTextLength(); return d.dx > d.w ? 1 : 0; });
 }
 
 Treemap.prototype.zoom = function(d) {

@@ -27,7 +27,6 @@ function SingleYearSlider(parentElem, years) {
 SingleYearSlider.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
-    this._eventHandler.on('resize', this, this.handleResize);
     
     return this;
   }
@@ -154,10 +153,11 @@ SingleYearSlider.prototype.update = function(options) {
  * @return SingleYearSlider
  */
 SingleYearSlider.prototype.brushed = function() {
+  var horizontalOffset = (parseInt(d3.select("body").style('width')) - this.width) / 2;
   var vis = this;
   var value = Math.round(vis.brush.extent()[0]);
   if (d3.event.sourceEvent) { // not a programmatic event
-    value = Math.round(vis.x.invert(d3.event.sourceEvent.x - vis.margin.left));
+    value = Math.round(vis.x.invert(d3.event.sourceEvent.x - horizontalOffset));
     this.eventHandler().broadcast({ name:'updateDrugs', year:value}, vis);
   }
 

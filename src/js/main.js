@@ -85,7 +85,8 @@ function loadData(error, topo, deaths, income, unemployment, drugUse, treatment)
  ***--------------------------------***/
 
 var handler = new EventHandler();
-d3.select(window).on('resize', function() {handler.broadcast({name: 'resize'});});
+// couldn't fix bugs with treemap sticky layout, so resizing messages are suppressed
+// d3.select(window).on('resize', function() {handler.broadcast({name: 'resize'});});
 d3.select('#switch-view-button').on('click', function() {handler.broadcast({name: 'switchView'});});
 
 // creates and initializes all visualizations 

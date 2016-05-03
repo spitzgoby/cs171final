@@ -26,7 +26,6 @@ function DrugTypeLegend(parentElem, types) {
 DrugTypeLegend.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
-    this._eventHandler.on('resize', this, this.handleResize);
     
     return this;
   }

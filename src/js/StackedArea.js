@@ -31,7 +31,6 @@ function StackedAreaChart(parentElem, chartElem, data) {
 StackedAreaChart.prototype.eventHandler = function(eventHandler) {
   if (eventHandler) {
     this._eventHandler = eventHandler;
-    this._eventHandler.on('resize', this, this.handleResize);
     this._eventHandler.on('switchView', this, this.switchView);
     
     return this;
